@@ -149,14 +149,6 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:400px;backgro
 .dash-bar-row .db-track{flex:1;height:16px;background:var(--bg-secondary);border-radius:8px;overflow:hidden}
 .dash-bar-row .db-fill{height:100%;border-radius:8px;display:flex;align-items:center;padding-left:6px;font-size:10px;font-weight:600;color:#fff;transition:width 0.5s}
 .dash-bar-row .db-pct{font-size:10px;color:var(--text-muted);width:40px;text-align:right}
-.dash-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-@media(max-width:600px){.dash-mini-grid{grid-template-columns:1fr}}
-.dash-mini{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
-.dash-mini h4{font-size:13px;font-weight:700;margin-bottom:8px}
-.dash-mini-bars{display:flex;align-items:end;gap:4px;height:44px}
-.dash-mini-bars .bar{flex:1;border-radius:2px 2px 0 0;min-height:3px;transition:height 0.3s}
-.dash-mini-labels{display:flex;gap:4px;margin-top:3px}
-.dash-mini-labels span{flex:1;text-align:center;font-size:9px;color:var(--text-muted)}
 .dash-refresh{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-secondary);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;margin:16px auto;touch-action:manipulation}
 .dash-refresh:hover{border-color:var(--accent);color:var(--accent)}
 .dash-loading{text-align:center;padding:40px;color:var(--text-muted);font-size:14px}
@@ -187,7 +179,7 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:400px;backgro
   <p class="section-sub">178 cm · 100 kg → 80 kg · 37 yaş · Bel: 115 cm · Sedanter → Atletik</p>
 
   <div class="beer-selector">
-    <div class="beer-label">🍺 Günlük Bira Sayısı <small>50cl standart lager · ~215 kcal / adet</small></div>
+    <div class="beer-label">🍺 Günlük İçki Sayısı <small>50cl standart lager bazında · ~215 kcal / adet</small></div>
     <div class="beer-btns">
       <button class="beer-btn" data-beer="0" onclick="setBeer(0)">0</button>
       <button class="beer-btn" data-beer="1" onclick="setBeer(1)">1</button>
@@ -195,10 +187,10 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:400px;backgro
       <button class="beer-btn" data-beer="3" onclick="setBeer(3)">3</button>
       <button class="beer-btn" data-beer="4" onclick="setBeer(4)">4</button>
     </div>
-    <div class="beer-info"><div class="cal" id="beer-cal-display">430</div><div class="cal-label">kcal / gün (biradan)</div></div>
+    <div class="beer-info"><div class="cal" id="beer-cal-display">430</div><div class="cal-label">kcal / gün (içkiden)</div></div>
     <div class="lock-row">
       <label class="lock-toggle"><input type="checkbox" id="lock-checkbox" onchange="toggleLock()"><span class="lock-slider"></span></label>
-      <div class="lock-label"><strong>Açığı Sabitle (−500 kcal)</strong><br>Aktifken: bira değişince diyet ve porsiyonlar otomatik ayarlanır, açık hep −500 kalır.</div>
+      <div class="lock-label"><strong>Açığı Sabitle (−500 kcal)</strong><br>Aktifken: içki değişince diyet ve porsiyonlar otomatik ayarlanır, açık hep −500 kalır.</div>
       <span class="lock-status off" id="lock-status">SERBEST</span>
     </div>
   </div>
@@ -225,6 +217,18 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:400px;backgro
     <strong style="font-size:13px;margin-top:4px">Elektronik sigara:</strong> Kardiyo kapasiteni etkiliyor. Plan koşuya zorlamıyor, yürüyüşle başlıyor.<br>
     <strong style="font-size:13px;margin-top:4px">Kan tahlili:</strong> Başlamadan önce mutlaka yaptır — açlık kan şekeri, HbA1c, karaciğer, tiroid. Bel çevresi 115 cm ile temel değerlerini bilmen önemli.
   </div></div>
+
+  <!-- LIVE DASHBOARD -->
+  <div class="divider"></div>
+  <h2 class="section-heading">İlerleme Dashboard</h2>
+  <p class="section-sub">Google Sheets'ten canlı veri · Sayfayı yenile = güncel veri</p>
+  <div id="dash-content"><div class="dash-loading" id="dash-loading">📡 Google Sheets'ten veri çekiliyor...</div></div>
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:16px 0">
+    <button class="dash-refresh" onclick="loadAllData()">🔄 Veriyi Yenile</button>
+    <a class="sheets-open" href="#" target="_blank" rel="noopener" id="sheets-edit-link">📊 Google Sheets'i Aç</a>
+  </div>
+
+  <div class="divider"></div>
 
   <h2 class="section-heading">Plan Özeti</h2>
   <div class="grid-3" style="margin-top:12px">
@@ -268,7 +272,7 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:400px;backgro
     <div class="meal-item"><span>Tam buğday ekmek + fıstık ezmesi</span><span class="kcal">~200 kcal</span></div>
     <p style="font-size:11px;color:var(--text-muted);margin-top:10px">⚠️ Yersen akşam porsiyonunu küçült.</p>
   </div>
-  <div class="info-box blue" style="margin-top:16px"><div class="icon">💡</div><div class="content"><strong>İpuçları</strong>Sipariş: ızgara/fırın seç, pilav yerine salata, sos kenarda. Basit yemek: tavuk doğra, tavada pişir, yanına bulgur + salata = 15 dk. Her bira için 1 bardak su. Kahveleri 15:00'ten sonra içme.</div></div>
+  <div class="info-box blue" style="margin-top:16px"><div class="icon">💡</div><div class="content"><strong>İpuçları</strong>Sipariş: ızgara/fırın seç, pilav yerine salata, sos kenarda. Basit yemek: tavuk doğra, tavada pişir, yanına bulgur + salata = 15 dk. Her içki için 1 bardak su. Kahveleri 15:00'ten sonra içme.</div></div>
 </div>
 
 <!-- ==================== POSTÜR ==================== -->
@@ -284,7 +288,7 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:400px;backgro
 <div class="page" id="page-sleep">
   <h2 class="section-heading">Uyku & Sirkadiyen Düzeltme</h2>
   <p class="section-sub">03:00–11:00 → 00:00–08:00</p>
-  <div class="info-box amber"><div class="icon">🍺</div><div class="content"><strong>Bira Zamanlama</strong>Son biranı en geç <strong>22:00'da</strong> bitir. Yatmadan en az 2 saat boşluk.</div></div>
+  <div class="info-box amber"><div class="icon">🍺</div><div class="content"><strong>İçki Zamanlama</strong>Son içkini en geç <strong>22:00'da</strong> bitir. Yatmadan en az 2 saat boşluk.</div></div>
   <div class="card"><div class="card-header"><div class="card-icon" style="background:rgba(59,130,246,0.1);color:var(--accent)">🕐</div><div><div class="card-title">6 Haftalık Uyku Kaydırma</div><div class="card-subtitle">Haftada 30 dk</div></div></div>
     <div class="sleep-week"><span class="sleep-wk">Hafta 1</span><span class="sleep-action">30 dk öne çek, alarm kur</span><span class="sleep-time">03:00→02:30 / 10:30</span></div>
     <div class="sleep-week"><span class="sleep-wk">Hafta 2</span><span class="sleep-action">30 dk daha, ekranı yatmadan 45 dk önce kes</span><span class="sleep-time">02:30→02:00 / 10:00</span></div>
@@ -298,7 +302,7 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:400px;backgro
     <div class="move"><span class="move-name">Ekranları yatmadan 45 dk önce kapat</span><span class="reps">her gece</span></div>
     <div class="move"><span class="move-name">Kahve son saati: 15:00</span><span class="reps">kesin sınır</span></div>
     <div class="move"><span class="move-name">Akşam postür rutini yatmadan 30 dk önce</span><span class="reps">her gece</span></div>
-    <div class="move"><span class="move-name">Bira → en geç 22:00</span><span class="reps">her gece</span></div>
+    <div class="move"><span class="move-name">İçki → en geç 22:00</span><span class="reps">her gece</span></div>
     <div class="move"><span class="move-name">E-sigara: yatmadan 1 saat önce bırak</span><span class="reps">her gece</span></div>
   </div>
 </div>
@@ -328,8 +332,6 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:400px;backgro
     <div class="track-item"><div class="t-icon">📏</div><div><div class="t-name">Bel Çevresi (ÖNCELİKLİ)</div><div class="t-freq">Haftada 1 · Pazartesi sabah</div><div class="t-how">Göbek hizasından, nefes verdikten sonra. Başlangıç: 115 cm.</div></div></div>
     <div class="track-item"><div class="t-icon">⚖️</div><div><div class="t-name">Tartı</div><div class="t-freq">Haftada 1 · Pazartesi sabah, aç karnına</div><div class="t-how">Aynı koşullarda. Haftalık trende bak.</div></div></div>
     <div class="track-item"><div class="t-icon">💪</div><div><div class="t-name">Antrenman Günlüğü</div><div class="t-freq">Her antrenman günü</div><div class="t-how">Gerçekte yaptığın tekrar sayılarını kaydet. Programdaki sayılar hedef.</div></div></div>
-    <div class="track-item"><div class="t-icon">😴</div><div><div class="t-name">Uyku Kalitesi</div><div class="t-freq">Günlük · Sabah uyanınca</div><div class="t-how">1–5 puan.</div></div></div>
-    <div class="track-item"><div class="t-icon">⚡</div><div><div class="t-name">Enerji / Ruh Hali</div><div class="t-freq">Günlük · Akşam</div><div class="t-how">1–5 puan.</div></div></div>
     <div class="track-item"><div class="t-icon">📸</div><div><div class="t-name">İlerleme Fotoğrafı</div><div class="t-freq">Ayda 1</div><div class="t-how">Aynı ışık, açı, kıyafet. Önden + yandan.</div></div></div>
     <div class="track-item"><div class="t-icon">🩸</div><div><div class="t-name">Kan Testi</div><div class="t-freq">Başlamadan önce + 3 ayda 1</div><div class="t-how">Açlık şekeri, HbA1c, karaciğer, tiroid, lipid.</div></div></div>
   </div>
@@ -357,7 +359,6 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:400px;backgro
     <div class="metric-card"><div class="metric-icon">📸</div><div><h4>Fotoğraf</h4><p>Ayda 1, aynı koşullarda.</p></div></div>
     <div class="metric-card"><div class="metric-icon">💪</div><div><h4>Güç Progresyonu</h4><p>Şınav 12'den başlıyorsun — kaydet.</p></div></div>
     <div class="metric-card"><div class="metric-icon">🩸</div><div><h4>Kan Testi</h4><p>Başlamadan önce + 3 ayda 1.</p></div></div>
-    <div class="metric-card"><div class="metric-icon">😴</div><div><h4>Uyku + Enerji</h4><p>Günlük 1-5 puan.</p></div></div>
   </div>
   <div class="card" style="margin-top:20px"><div class="card-title" style="margin-bottom:12px">📊 Kilometre Taşları</div>
     <div class="move"><span class="move-name">Hafta 0 — Kan tahlili yaptır</span><span class="reps" style="color:var(--danger);font-weight:700">BAŞLAMADAN ÖNCE</span></div>
@@ -508,17 +509,17 @@ function updateAll(){
   document.getElementById('timeline-fill').style.width='5%';
   const ne=document.getElementById('alcohol-note-text');
   if(beerCount===0)ne.innerHTML='<strong>Alkolsüz!</strong> Açık <strong>'+z.deficit+'</strong> kcal. ~<strong>'+z.weeks+'</strong> hafta.';
-  else ne.innerHTML='<strong>Alkolsüz alternatif:</strong> Biraları bırakırsan <strong>'+p.beerCals+'</strong> kcal kazanırsın → <strong>~'+p.weeks+'</strong> → <strong>~'+z.weeks+'</strong> hafta.';
+  else ne.innerHTML='<strong>Alkolsüz alternatif:</strong> İçkiyi bırakırsan <strong>'+p.beerCals+'</strong> kcal kazanırsın → <strong>~'+p.weeks+'</strong> → <strong>~'+z.weeks+'</strong> hafta.';
   const wb=document.getElementById('warning-box'),wt=document.getElementById('warning-text');wb.style.display='none';
   if(p.deficit<200){wb.style.display='flex';if(p.deficit<=0)wt.innerHTML='<strong>Açık yok!</strong> Toplam ('+p.totalIntake+') ≥ TDEE ('+TDEE+').';else wt.innerHTML='<strong>Düşük açık!</strong> '+p.deficit+' kcal — '+p.weeks+' hafta.';}
-  if(lockMode&&p.foodCals<=MIN_FOOD&&beerCount>=3){wb.style.display='flex';wt.innerHTML='<strong>Yiyecek tabanı!</strong> '+beerCount+' bira ile yiyecek '+MIN_FOOD+' kcal\'e düştü.';}
+  if(lockMode&&p.foodCals<=MIN_FOOD&&beerCount>=3){wb.style.display='flex';wt.innerHTML='<strong>Yiyecek tabanı!</strong> '+beerCount+' içki ile yiyecek '+MIN_FOOD+' kcal\'e düştü.';}
   document.getElementById('milestone-final').textContent=p.weeks<999?'Hafta '+p.weeks+' — Hedef!':'Hedef — ayarları değiştir';
-  document.getElementById('macro-subtitle').textContent='Yiyecek: '+p.foodCals+' · Bira: '+p.beerCals+' · Toplam: '+p.totalIntake+' kcal';
+  document.getElementById('macro-subtitle').textContent='Yiyecek: '+p.foodCals+' · İçki: '+p.beerCals+' · Toplam: '+p.totalIntake+' kcal';
   document.getElementById('macro-bar-p').style.width=p.proteinPct+'%';document.getElementById('macro-bar-p').textContent=p.proteinPct+'%';document.getElementById('macro-val-p').textContent=p.proteinG+'g';
   document.getElementById('macro-bar-c').style.width=p.carbPct+'%';document.getElementById('macro-bar-c').textContent=p.carbPct+'%';document.getElementById('macro-val-c').textContent=p.carbG+'g';
   document.getElementById('macro-bar-f').style.width=p.fatPct+'%';document.getElementById('macro-bar-f').textContent=p.fatPct+'%';document.getElementById('macro-val-f').textContent=p.fatG+'g';
-  if(beerCount===0)document.getElementById('nutrition-beer-note').innerHTML='Bira seçilmedi — tüm bütçe yiyeceğe ayrılmış.';
-  else{let x=lockMode?' <strong>Açık sabitlendi (−500)</strong> — porsiyonlar otomatik.':' Sayacı "Genel Bakış"tan değiştirebilirsin.';document.getElementById('nutrition-beer-note').innerHTML='Günde '+beerCount+' bira ('+p.beerCals+' kcal) dahil.'+x;}
+  if(beerCount===0)document.getElementById('nutrition-beer-note').innerHTML='İçki seçilmedi — tüm bütçe yiyeceğe ayrılmış.';
+  else{let x=lockMode?' <strong>Açık sabitlendi (−500)</strong> — porsiyonlar otomatik.':' Sayacı "Genel Bakış"tan değiştirebilirsin.';document.getElementById('nutrition-beer-note').innerHTML='Günde '+beerCount+' içki ('+p.beerCals+' kcal) dahil.'+x;}
   const ls=document.getElementById('lock-status');if(lockMode){ls.textContent='−500 SABİT';ls.className='lock-status on'}else{ls.textContent='SERBEST';ls.className='lock-status off'}
   renderMeals(p);
 }
@@ -532,136 +533,131 @@ function toggleDay(h){h.parentElement.classList.toggle('open')}
 renderTraining();renderPosture();updateAll();
 
 // ===== GOOGLE SHEETS DASHBOARD =====
-const SHEET_CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vThdCSyNyAfIs4DEMoJnCo6OEt44hloTjotztqMqdPbSqGDkKECRBBHfkuimYXw8sX4XQS5mvAjsR97/pub?output=csv';
+const SHEET_WEEKLY='https://docs.google.com/spreadsheets/d/e/2PACX-1vThdCSyNyAfIs4DEMoJnCo6OEt44hloTjotztqMqdPbSqGDkKECRBBHfkuimYXw8sX4XQS5mvAjsR97/pub?output=csv';
+const SHEET_TRAINING='https://docs.google.com/spreadsheets/d/e/2PACX-1vThdCSyNyAfIs4DEMoJnCo6OEt44hloTjotztqMqdPbSqGDkKECRBBHfkuimYXw8sX4XQS5mvAjsR97/pub?gid=23280774&single=true&output=csv';
+const SHEETS_EDIT='https://docs.google.com/spreadsheets/d/e/2PACX-1vThdCSyNyAfIs4DEMoJnCo6OEt44hloTjotztqMqdPbSqGDkKECRBBHfkuimYXw8sX4XQS5mvAjsR97/pubhtml';
+
+// Gösterge hareketler — antrenman günlüğündeki isimleriyle eşleşmeli
+const INDICATOR_EXERCISES=[
+  {name:'Şınav',key:'şınav',color:'var(--accent)'},
+  {name:'Barfiks',key:'barfiks',color:'var(--success)'},
+  {name:'Squat',key:'squat',color:'#a855f7'},
+  {name:'Lateral Raise',key:'lateral raise',color:'var(--accent-warm)'},
+  {name:'Plank (sn)',key:'plank',color:'#ec4899'},
+  {name:'Koşu Bandı (dk)',key:'koşu bandı',color:'#06b6d4'}
+];
 
 function parseCSV(text){
-  const lines=text.split('\n').map(l=>l.split(',').map(c=>c.replace(/^"|"$/g,'').trim()));
-  return lines;
+  return text.split('\n').map(l=>l.split(',').map(c=>c.replace(/^"|"$/g,'').trim()));
 }
 
-function loadSheetData(){
-  const el=document.getElementById('dash-content');
+function loadAllData(){
   document.getElementById('dash-loading').style.display='block';
+  const el=document.getElementById('dash-content');
   
-  fetch(SHEET_CSV_URL)
-    .then(r=>{if(!r.ok)throw new Error('Sheets yanıt vermedi');return r.text()})
-    .then(csv=>{
-      const rows=parseCSV(csv);
-      renderDashboard(rows);
-    })
-    .catch(err=>{
-      el.innerHTML=`<div class="info-box red"><div class="icon">⚠️</div><div class="content"><strong>Veri çekilemedi</strong>${err.message}<br><br>Olası sebepler:<br>• Google Sheets "Web'de yayınla" aktif olmayabilir<br>• İnternet bağlantısı sorunu<br>• Sheets linki değişmiş olabilir<br><br>Sheets'i doğrudan açarak verilerini görebilirsin.</div></div>`;
-    });
+  Promise.all([
+    fetch(SHEET_WEEKLY).then(r=>r.ok?r.text():Promise.reject('Haftalık veri çekilemedi')),
+    fetch(SHEET_TRAINING).then(r=>r.ok?r.text():Promise.reject('Antrenman verisi çekilemedi')).catch(()=>null)
+  ]).then(([weeklyCSV, trainingCSV])=>{
+    const weeklyRows=parseCSV(weeklyCSV);
+    const trainingRows=trainingCSV?parseCSV(trainingCSV):null;
+    renderFullDashboard(weeklyRows, trainingRows);
+  }).catch(err=>{
+    el.innerHTML=`<div class="info-box red"><div class="icon">⚠️</div><div class="content"><strong>Veri çekilemedi</strong>${err}<br>Google Sheets "Web'de yayınla" aktif olmayabilir veya bağlantı sorunu olabilir.</div></div>`;
+  });
 }
 
-function renderDashboard(rows){
-  // Find header row (Hafta, Tarih, Tartı, Bel, Uyku, Enerji, Fotoğraf, Notlar)
-  let headerIdx=-1;
-  for(let i=0;i<Math.min(rows.length,10);i++){
-    if(rows[i][0]&&rows[i][0].toLowerCase().includes('hafta')){headerIdx=i;break}
-  }
-  if(headerIdx===-1){
-    document.getElementById('dash-content').innerHTML='<div class="info-box amber"><div class="icon">📋</div><div class="content"><strong>Veri bulunamadı</strong>Sheets\'te "Haftalık Takip" başlık satırı bulunamadı. Şablonu doğru yüklediğinden emin ol.</div></div>';
-    return;
-  }
-
-  // Parse weekly data
-  const weeks=[];
-  for(let i=headerIdx+1;i<rows.length;i++){
-    const r=rows[i];
-    if(!r[0]||r[0].trim()==='')continue;
-    const w={
-      label:r[0]||'',
-      date:r[1]||'',
-      weight:parseFloat(r[2])||null,
-      waist:parseFloat(r[3])||null,
-      sleep:parseFloat(r[4])||null,
-      energy:parseFloat(r[5])||null,
-      photo:r[6]||'',
-      notes:r[7]||''
-    };
-    weeks.push(w);
-  }
-
-  // Find data-filled weeks
-  const filled=weeks.filter(w=>w.weight||w.waist);
-  const START_W=100, START_WAIST=115;
-
-  // Latest values
-  const latest=filled.length>0?filled[filled.length-1]:{weight:START_W,waist:START_WAIST,sleep:null,energy:null};
-  const latestW=latest.weight||START_W;
-  const latestWaist=latest.waist||START_WAIST;
-  const deltaW=latestW-START_W;
-  const deltaWaist=latestWaist-START_WAIST;
+function renderFullDashboard(weeklyRows, trainingRows){
+  document.getElementById('dash-loading').style.display='none';
   
-  // Average sleep/energy from last entries
-  const sleepVals=weeks.filter(w=>w.sleep).slice(-7);
-  const energyVals=weeks.filter(w=>w.energy).slice(-7);
-  const avgSleep=sleepVals.length>0?(sleepVals.reduce((a,b)=>a+b.sleep,0)/sleepVals.length).toFixed(1):'—';
-  const avgEnergy=energyVals.length>0?(energyVals.reduce((a,b)=>a+b.energy,0)/energyVals.length).toFixed(1):'—';
+  // === PARSE WEEKLY ===
+  let hIdx=-1;
+  for(let i=0;i<Math.min(weeklyRows.length,10);i++){
+    if(weeklyRows[i][0]&&weeklyRows[i][0].toLowerCase().includes('hafta')){hIdx=i;break}
+  }
+  const weeks=[];
+  if(hIdx>=0){
+    for(let i=hIdx+1;i<weeklyRows.length;i++){
+      const r=weeklyRows[i];
+      if(!r[0]||!r[0].trim())continue;
+      weeks.push({label:r[0],date:r[1]||'',weight:parseFloat(r[2])||null,waist:parseFloat(r[3])||null});
+    }
+  }
+  const filled=weeks.filter(w=>w.weight||w.waist);
+  const START_W=100,START_WAIST=115;
+  const latest=filled.length>0?filled[filled.length-1]:{weight:START_W,waist:START_WAIST};
+  const latestW=latest.weight||START_W, latestWaist=latest.waist||START_WAIST;
+  const deltaW=latestW-START_W, deltaWaist=latestWaist-START_WAIST;
   const weekNum=filled.length;
 
-  let html='';
-  document.getElementById('dash-loading').style.display='none';
+  // === PARSE TRAINING — extract indicator exercises ===
+  let strengthData={};
+  if(trainingRows){
+    // Find rows matching indicator exercises, get their set values
+    // Columns: Tarih(0), Gün(1), Faz(2), Hareket(3), Set1(4), Set2(5), Set3(6)
+    const entries=[];
+    for(let i=0;i<trainingRows.length;i++){
+      const r=trainingRows[i];
+      if(!r[3])continue;
+      const name=r[3].toLowerCase();
+      const s1=parseFloat(r[4])||0, s2=parseFloat(r[5])||0, s3=parseFloat(r[6])||0;
+      if(s1===0&&s2===0&&s3===0)continue;
+      const avg=Math.round(((s1+(s2||s1)+(s3||s1))/(s3?3:s2?2:1))*10)/10;
+      entries.push({name,avg,date:r[0]||'',idx:i});
+    }
+    
+    // For each indicator, find first and last entries
+    INDICATOR_EXERCISES.forEach(ind=>{
+      const matches=entries.filter(e=>e.name.includes(ind.key));
+      if(matches.length>0){
+        strengthData[ind.key]={
+          first:matches[0].avg,
+          last:matches[matches.length-1].avg,
+          count:matches.length
+        };
+      }
+    });
+  }
 
-  // Stat cards
+  let html='';
+
+  // === STAT CARDS ===
   html+=`<div class="dash-stats">
     <div class="dash-stat"><div class="ds-label">Tartı (kg)</div><div class="ds-val">${latestW}</div><div class="ds-delta ${deltaW<0?'pos':deltaW>0?'neg':'neu'}">${deltaW>0?'+':''}${deltaW.toFixed(1)} kg</div></div>
     <div class="dash-stat"><div class="ds-label">Bel (cm)</div><div class="ds-val">${latestWaist}</div><div class="ds-delta ${deltaWaist<0?'pos':deltaWaist>0?'neg':'neu'}">${deltaWaist>0?'+':''}${deltaWaist.toFixed(0)} cm</div></div>
-    <div class="dash-stat"><div class="ds-label">Uyku ort.</div><div class="ds-val">${avgSleep}</div><div class="ds-delta ${parseFloat(avgSleep)>=4?'pos':parseFloat(avgSleep)>=3?'neu':'neg'}">${parseFloat(avgSleep)>=4?'iyi':parseFloat(avgSleep)>=3?'orta':'geliştir'}</div></div>
     <div class="dash-stat"><div class="ds-label">Hafta</div><div class="ds-val" style="color:var(--accent)">${weekNum}</div><div class="ds-delta neu">/ 40</div></div>
+    <div class="dash-stat"><div class="ds-label">Hedef</div><div class="ds-val" style="color:var(--accent-warm)">80</div><div class="ds-delta neu">${(latestW-80).toFixed(1)} kg kaldı</div></div>
   </div>`;
 
-  // Trend chart (weight + waist)
+  // === WEIGHT + WAIST TREND CHART ===
   if(filled.length>=2){
-    const chartW=680, chartH=140, padL=45, padR=10, padT=10, padB=25;
-    const plotW=chartW-padL-padR, plotH=chartH-padT-padB;
+    const cW=680,cH=140,pL=45,pR=10,pT=10,pB=25;
+    const plW=cW-pL-pR,plH=cH-pT-pB;
     const wVals=filled.map(w=>w.weight).filter(Boolean);
-    const waistVals=filled.map(w=>w.waist).filter(Boolean);
-    
-    const wMin=Math.min(...wVals)-1, wMax=Math.max(...wVals)+1;
+    const wMin=Math.min(...wVals)-1,wMax=Math.max(...wVals)+1;
     const pts=filled.length;
-    
-    let wLine='', waistLine='';
+    let wLine='',waistLine='';
     filled.forEach((w,i)=>{
-      const x=padL+(i/(pts-1))*plotW;
-      if(w.weight){
-        const y=padT+plotH-(((w.weight-wMin)/(wMax-wMin))*plotH);
-        wLine+=(wLine?'L':'M')+x.toFixed(0)+','+y.toFixed(0)+' ';
-      }
-      if(w.waist){
-        // Scale waist to same visual range
-        const wNorm=(w.waist-(START_WAIST-10))/25;
-        const y=padT+plotH-(wNorm*plotH);
-        waistLine+=(waistLine?'L':'M')+x.toFixed(0)+','+Math.max(padT,Math.min(padT+plotH,y)).toFixed(0)+' ';
-      }
+      const x=pL+(i/(pts-1))*plW;
+      if(w.weight){const y=pT+plH-(((w.weight-wMin)/(wMax-wMin))*plH);wLine+=(wLine?'L':'M')+x.toFixed(0)+','+y.toFixed(0)+' ';}
+      if(w.waist){const wN=(w.waist-(START_WAIST-10))/25;const y=pT+plH-(wN*plH);waistLine+=(waistLine?'L':'M')+x.toFixed(0)+','+Math.max(pT,Math.min(pT+plH,y)).toFixed(0)+' ';}
     });
-
-    // Grid lines
-    const gridCount=4;
-    let gridSvg='';
-    for(let g=0;g<=gridCount;g++){
-      const y=padT+(g/gridCount)*plotH;
-      const val=(wMax-(g/gridCount)*(wMax-wMin)).toFixed(0);
-      gridSvg+=`<line x1="${padL}" y1="${y}" x2="${chartW-padR}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>`;
-      gridSvg+=`<text x="${padL-4}" y="${y+4}" text-anchor="end" font-size="9" fill="var(--text-muted)" font-family="'JetBrains Mono',monospace">${val}</text>`;
+    let gridSvg='',xLabels='';
+    for(let g=0;g<=4;g++){
+      const y=pT+(g/4)*plH,val=(wMax-(g/4)*(wMax-wMin)).toFixed(0);
+      gridSvg+=`<line x1="${pL}" y1="${y}" x2="${cW-pR}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>`;
+      gridSvg+=`<text x="${pL-4}" y="${y+4}" text-anchor="end" font-size="9" fill="var(--text-muted)" font-family="'JetBrains Mono',monospace">${val}</text>`;
     }
-    // X labels
-    let xLabels='';
     filled.forEach((w,i)=>{
       if(i%(Math.ceil(pts/8))===0||i===pts-1){
-        const x=padL+(i/(pts-1))*plotW;
-        xLabels+=`<text x="${x}" y="${chartH-2}" text-anchor="middle" font-size="9" fill="var(--text-muted)">${w.label.replace('Hafta ','H')}</text>`;
+        const x=pL+(i/(pts-1))*plW;
+        xLabels+=`<text x="${x}" y="${cH-2}" text-anchor="middle" font-size="9" fill="var(--text-muted)">${w.label.replace('Hafta ','H').replace('Başlangıç','Baş')}</text>`;
       }
     });
-
-    // Last point dots
-    const lastFilled=filled[filled.length-1];
-    const lastX=padL+((pts-1)/(pts-1))*plotW;
-    const lastWY=padT+plotH-(((lastFilled.weight-wMin)/(wMax-wMin))*plotH);
-
+    const lastX=pL+((pts-1)/(pts-1))*plW;
+    const lastWY=pT+plH-(((filled[pts-1].weight-wMin)/(wMax-wMin))*plH);
     html+=`<div class="dash-chart"><h3>Tartı & bel çevresi trendi</h3>
-      <svg viewBox="0 0 ${chartW} ${chartH}" style="width:100%;height:auto">
+      <svg viewBox="0 0 ${cW} ${cH}" style="width:100%;height:auto">
         ${gridSvg}
         <path d="${wLine}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="${waistLine}" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,3"/>
@@ -670,45 +666,42 @@ function renderDashboard(rows){
       </svg>
       <div style="display:flex;gap:14px;font-size:11px;color:var(--text-secondary);margin-top:6px">
         <span><span style="display:inline-block;width:12px;height:2.5px;background:var(--accent);border-radius:1px;vertical-align:middle;margin-right:4px"></span>Tartı (kg)</span>
-        <span><span style="display:inline-block;width:12px;height:2px;border-top:2px dashed var(--success);vertical-align:middle;margin-right:4px"></span>Bel (cm, ölçekli)</span>
-      </div>
-    </div>`;
+        <span><span style="display:inline-block;width:12px;height:2px;border-top:2px dashed var(--success);vertical-align:middle;margin-right:4px"></span>Bel (cm)</span>
+      </div></div>`;
   } else {
-    html+=`<div class="dash-chart"><h3>Tartı & bel çevresi trendi</h3><p style="color:var(--text-muted);font-size:13px;padding:20px 0;text-align:center">En az 2 haftalık veri girildikten sonra grafik burada görünecek.</p></div>`;
+    html+=`<div class="dash-chart"><h3>Tartı & bel çevresi trendi</h3><p style="color:var(--text-muted);font-size:13px;padding:20px 0;text-align:center">En az 2 haftalık veri girildikten sonra grafik görünecek.</p></div>`;
   }
 
-  // Sleep & Energy mini bars (last 7 entries)
-  function miniBarHtml(title, vals, color){
-    if(vals.length===0) return `<div class="dash-mini"><h4>${title}</h4><p style="color:var(--text-muted);font-size:12px">Henüz veri yok</p></div>`;
-    let bars='', labels='';
-    vals.slice(-7).forEach((v,i)=>{
-      const h=Math.max(6,(v.val/5)*100);
-      const c=v.val>=4?'var(--success)':v.val>=3?color:'var(--danger)';
-      bars+=`<div class="bar" style="height:${h}%;background:${c}"></div>`;
-      labels+=`<span>${v.label||''}</span>`;
+  // === STRENGTH PROGRESSION BARS ===
+  const hasStrength=Object.keys(strengthData).length>0;
+  html+=`<div class="dash-chart"><h3>Güç Progresyonu ${hasStrength?'(Antrenman Günlüğü\'nden)':''}${!hasStrength?' — henüz veri yok':''}</h3>`;
+  if(hasStrength){
+    html+=`<div class="dash-bars">`;
+    INDICATOR_EXERCISES.forEach(ind=>{
+      const d=strengthData[ind.key];
+      if(!d)return;
+      const pct=d.first>0?Math.round(((d.last-d.first)/d.first)*100):0;
+      const barW=Math.min(95,Math.max(10,(d.last/(d.first*2))*100));
+      html+=`<div class="dash-bar-row">
+        <span class="db-name">${ind.name}</span>
+        <div class="db-track"><div class="db-fill" style="width:${barW}%;background:${ind.color}">${d.first} → ${d.last}</div></div>
+        <span class="db-pct">${pct>0?'+':''}${pct}%</span>
+      </div>`;
     });
-    return `<div class="dash-mini"><h4>${title}</h4><div class="dash-mini-bars">${bars}</div><div class="dash-mini-labels">${labels}</div></div>`;
+    html+=`</div>`;
+  } else {
+    html+=`<p style="color:var(--text-muted);font-size:13px;padding:16px 0;text-align:center">Antrenman Günlüğü'ne set/tekrar girdiğinde burada gösterge hareketlerinin ilerlemesini göreceksin.</p>`;
   }
-
-  const sleepData=weeks.filter(w=>w.sleep).map(w=>({val:w.sleep,label:w.label?w.label.replace('Hafta ','H'):''}));
-  const energyData=weeks.filter(w=>w.energy).map(w=>({val:w.energy,label:w.label?w.label.replace('Hafta ','H'):''}));
-
-  html+=`<div class="dash-mini-grid">
-    ${miniBarHtml('Uyku (son girişler)',sleepData,'var(--accent-warm)')}
-    ${miniBarHtml('Enerji (son girişler)',energyData,'var(--accent)')}
-  </div>`;
+  html+=`</div>`;
 
   document.getElementById('dash-content').innerHTML=html;
 }
 
-// Auto-load on page show
-const origShowPage=showPage;
-showPage=function(id,btn){
-  origShowPage(id,btn);
-  if(id==='tracking') loadSheetData();
-};
-// Initial load if tracking is active
-if(document.getElementById('page-tracking').classList.contains('active')) loadSheetData();
+// Set sheets edit link
+document.getElementById('sheets-edit-link').href=SHEETS_EDIT;
+
+// Auto-load dashboard on page load (overview is default active page)
+loadAllData();
 </script>
 </body>
 </html>
