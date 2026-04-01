@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Proje Alper — Dönüşüm Planı</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg-primary:#06080d;--bg-secondary:#0d1117;--bg-card:#151b25;--border:#1e2a3a;--border-light:#2a3a4e;--text-primary:#e8edf5;--text-secondary:#8b95a5;--text-muted:#5a6577;--accent:#3b82f6;--accent-warm:#f59e0b;--success:#22c55e;--danger:#ef4444;--phase-1:#ffffff;--phase-1-bg:rgba(255,255,255,0.06);--phase-1-border:rgba(255,255,255,0.18);--phase-2:#5b9cf5;--phase-2-bg:rgba(91,156,245,0.08);--phase-2-border:rgba(91,156,245,0.25);--phase-3:#8b95a5;--phase-3-bg:rgba(139,149,165,0.08);--phase-3-border:rgba(139,149,165,0.22);--radius:12px;--radius-sm:8px;--radius-lg:16px;--nav-h:60px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:'Outfit',system-ui,-apple-system,sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-x:hidden;line-height:1.6;-webkit-tap-highlight-color:transparent;padding-bottom:calc(var(--nav-h) + 16px)}
+body::before{content:'';position:fixed;top:0;left:0;right:0;height:300px;background:radial-gradient(ellipse at 50% 0%,rgba(59,130,246,0.07) 0%,transparent 70%);pointer-events:none;z-index:0}
+::-webkit-scrollbar{display:none}
+
+/* HEADER — simple top bar with logo only */
+.header{position:sticky;top:0;z-index:100;background:rgba(6,8,13,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 16px}
+.header-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:center;height:48px}
+.logo{font-weight:800;font-size:17px;letter-spacing:-0.5px;background:linear-gradient(135deg,var(--text-primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo span{font-weight:400;opacity:0.6}
+
+/* BOTTOM NAV — fixed bottom tab bar */
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;gap:0;background:rgba(6,8,13,0.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:6px 4px;padding-bottom:max(6px,env(safe-area-inset-bottom));border-radius:0}
+.nav-btn{flex:1;padding:6px 2px;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--text-muted);font-family:inherit;font-size:10px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;min-height:44px;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.nav-btn:hover,.nav-btn:active{color:var(--text-primary)}
+.nav-btn.active{color:var(--accent);background:rgba(59,130,246,0.1)}
+.nav-icon{font-size:18px;line-height:1}
+
+/* MAIN */
+.main{max-width:600px;margin:0 auto;padding:16px 14px 24px;position:relative;z-index:1}
+.page{display:none;animation:fadeIn 0.3s ease}.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:14px;transition:border-color 0.2s}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.card-icon{width:36px;height:36px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.card-title{font-size:16px;font-weight:700;letter-spacing:-0.3px}
+.card-subtitle{font-size:12px;color:var(--text-secondary);margin-top:2px}
+
+/* GRIDS — mobile first: 1 col, then 2 on wider */
+.grid-2,.grid-3{display:grid;grid-template-columns:1fr;gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:500px){.grid-2{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(3,1fr)}}
+
+/* STAT BOXES */
+.stat-box{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:12px 10px;text-align:center}
+.stat-value{font-size:22px;font-weight:800;letter-spacing:-1px;font-family:'JetBrains Mono','Outfit',monospace}
+.stat-label{font-size:10px;color:var(--text-secondary);margin-top:3px;text-transform:uppercase;letter-spacing:0.5px}
+
+/* DRINK SELECTOR */
+.beer-selector{display:flex;flex-direction:column;gap:12px;background:linear-gradient(135deg,rgba(245,158,11,0.05),rgba(245,158,11,0.02));border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius-lg);padding:16px;margin-bottom:16px}
+.beer-label{font-size:14px;font-weight:600;color:var(--accent-warm);width:100%}
+.beer-label small{display:block;font-weight:400;font-size:11px;color:var(--text-secondary);margin-top:2px}
+.beer-btns{display:flex;gap:6px;flex-wrap:wrap}
+.beer-btn{width:48px;height:48px;border-radius:var(--radius);border:2px solid var(--border);background:var(--bg-secondary);color:var(--text-secondary);font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.beer-btn:active{transform:scale(0.95)}
+.beer-btn.active{background:var(--accent-warm);border-color:var(--accent-warm);color:#000;box-shadow:0 2px 12px rgba(245,158,11,0.3)}
+.beer-info{text-align:left;font-family:'JetBrains Mono',monospace}
+.beer-info .cal{font-size:20px;font-weight:700;color:var(--accent-warm);display:inline}
+.beer-info .cal-label{font-size:11px;color:var(--text-secondary);display:inline;margin-left:6px}
+.lock-row{display:flex;align-items:center;gap:12px;width:100%;padding-top:12px;border-top:1px solid rgba(245,158,11,0.12);flex-wrap:wrap}
+.lock-toggle{position:relative;width:52px;height:30px;flex-shrink:0;cursor:pointer;touch-action:manipulation}
+.lock-toggle input{opacity:0;width:0;height:0}
+.lock-slider{position:absolute;inset:0;background:var(--border);border-radius:15px;transition:all 0.25s}
+.lock-slider::before{content:'';position:absolute;width:24px;height:24px;left:3px;top:3px;background:var(--text-secondary);border-radius:50%;transition:all 0.25s}
+.lock-toggle input:checked+.lock-slider{background:var(--accent);box-shadow:0 0 12px rgba(59,130,246,0.3)}
+.lock-toggle input:checked+.lock-slider::before{transform:translateX(22px);background:#fff}
+.lock-label{font-size:12px;color:var(--text-secondary);line-height:1.4;flex:1;min-width:0}
+.lock-label strong{color:var(--text-primary);font-size:13px}
+.lock-status{font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;border-radius:6px;font-weight:600;white-space:nowrap}
+.lock-status.on{background:rgba(59,130,246,0.12);color:var(--accent)}
+.lock-status.off{background:rgba(139,149,165,0.1);color:var(--text-muted)}
+
+/* TIMELINE */
+.timeline-bar{height:8px;background:var(--bg-secondary);border-radius:4px;overflow:hidden;margin-top:8px}
+.timeline-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--success));transition:width 0.6s ease}
+
+/* PHASE SYSTEM */
+.phase-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:0.3px}
+.phase-1 .phase-badge,.badge-p1{background:var(--phase-1-bg);color:var(--phase-1);border:1px solid var(--phase-1-border)}
+.phase-2 .phase-badge,.badge-p2{background:var(--phase-2-bg);color:var(--phase-2);border:1px solid var(--phase-2-border)}
+.phase-3 .phase-badge,.badge-p3{background:var(--phase-3-bg);color:var(--phase-3);border:1px solid var(--phase-3-border)}
+.phase-card{border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;border:1px solid}
+.phase-card.phase-1{background:var(--phase-1-bg);border-color:var(--phase-1-border)}
+.phase-card.phase-2{background:var(--phase-2-bg);border-color:var(--phase-2-border)}
+.phase-card.phase-3{background:var(--phase-3-bg);border-color:var(--phase-3-border)}
+.phase-title{font-size:17px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.phase-1 .phase-title{color:var(--phase-1)}.phase-2 .phase-title{color:var(--phase-2)}.phase-3 .phase-title{color:var(--phase-3)}
+.phase-weeks{font-size:12px;color:var(--text-secondary);margin-bottom:14px}
+
+/* DAY BLOCKS */
+.day-block{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.06);border-radius:var(--radius);margin-bottom:8px;overflow:hidden}
+.day-header{padding:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;touch-action:manipulation;min-height:56px}
+.day-header:active{background:rgba(255,255,255,0.04)}
+.day-name{font-weight:700;font-size:13px}
+.day-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;margin-left:4px;vertical-align:middle;letter-spacing:0.3px}
+.day-tag.train{background:rgba(59,130,246,0.12);color:var(--accent)}
+.day-tag.posture{background:rgba(34,197,94,0.1);color:var(--success)}
+.day-focus{font-size:11px;color:var(--text-secondary)}
+.day-toggle{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:transform 0.2s;font-size:14px;flex-shrink:0}
+.day-block.open .day-toggle{transform:rotate(180deg)}
+.day-content{display:none;padding:0 14px 14px}
+.day-block.open .day-content{display:block}
+.rest-day{padding:12px 14px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);background:rgba(0,0,0,0.15);border:1px solid rgba(255,255,255,0.04);border-radius:var(--radius);margin-bottom:8px}
+.posture-reminder{display:inline-block;padding:4px 10px;border-radius:6px;background:rgba(34,197,94,0.08);color:var(--success);font-size:11px;font-weight:600;border:1px solid rgba(34,197,94,0.18);margin-top:10px}
+.warmup-tag{display:inline-block;padding:4px 10px;border-radius:6px;background:rgba(245,158,11,0.1);color:var(--accent-warm);font-size:11px;font-weight:600;margin-bottom:10px;border:1px solid rgba(245,158,11,0.2)}
+
+/* EXERCISE ROWS */
+.exercise{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px}
+.exercise:last-child{border-bottom:none}
+.exercise .name{flex:1;color:var(--text-primary);line-height:1.4}
+.exercise .detail{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-secondary);white-space:nowrap}
+.yt-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;flex-shrink:0;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#ef4444;cursor:pointer;transition:all 0.15s;text-decoration:none;touch-action:manipulation}
+.yt-btn:active{transform:scale(0.9);background:rgba(239,68,68,0.3)}
+.yt-btn svg{width:16px;height:16px;fill:currentColor}
+
+/* MOVE ROWS (posture, sleep hygiene, milestones) */
+.move{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;gap:8px}
+.move:last-child{border-bottom:none}
+.move .move-name{flex:1}
+.move .reps{font-family:'JetBrains Mono',monospace;color:var(--text-secondary);font-size:11px;white-space:nowrap}
+
+/* INFO BOXES */
+.info-box{border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;display:flex;gap:10px;font-size:13px;line-height:1.6}
+.info-box.blue{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);color:var(--accent)}
+.info-box.amber{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--accent-warm)}
+.info-box.green{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);color:var(--success)}
+.info-box.red{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--danger)}
+.info-box .icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.info-box .content{flex:1}
+.info-box .content strong{display:block;margin-bottom:3px;font-size:13px}
+
+/* MEAL SYSTEM */
+.meal-toggle{display:flex;gap:2px;background:var(--bg-secondary);border-radius:var(--radius);padding:3px;margin-bottom:16px;width:100%}
+.meal-toggle-btn{flex:1;padding:12px 8px;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--text-secondary);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;touch-action:manipulation;text-align:center}
+.meal-toggle-btn.active{background:var(--accent);color:#fff;box-shadow:0 2px 12px rgba(59,130,246,0.3)}
+.meal-card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.meal-card h4{font-size:14px;font-weight:700;margin-bottom:3px}
+.meal-card .time{font-size:10px;color:var(--text-muted);margin-bottom:8px}
+.meal-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px;gap:8px}
+.meal-item:last-child{border-bottom:none}
+.meal-item .kcal{font-family:'JetBrains Mono',monospace;color:var(--text-secondary);font-size:10px;white-space:nowrap;flex-shrink:0}
+.meal-total{margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:12px;color:var(--accent)}
+.macro-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.macro-label{width:50px;font-size:12px;font-weight:600}
+.macro-bar{flex:1;height:20px;background:var(--bg-secondary);border-radius:10px;overflow:hidden}
+.macro-fill{height:100%;border-radius:10px;transition:width 0.4s ease;display:flex;align-items:center;padding:0 8px;font-size:10px;font-weight:600}
+.macro-fill.protein{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
+.macro-fill.carb{background:linear-gradient(90deg,#22c55e,#4ade80)}
+.macro-fill.fat{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.macro-val{width:50px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-secondary)}
+
+/* POSTURE */
+.routine-block{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.routine-block h4{font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.routine-block .dur{font-size:10px;padding:3px 8px;border-radius:12px;background:rgba(59,130,246,0.1);color:var(--accent);font-weight:600}
+
+/* SLEEP */
+.sleep-week{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;flex-wrap:wrap}
+.sleep-wk{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--accent);width:60px;flex-shrink:0}
+.sleep-action{font-size:12px;flex:1;min-width:120px}
+.sleep-time{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--text-primary);white-space:nowrap;width:100%;margin-top:2px}
+
+/* METRICS & TRACKING */
+.metric-card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;align-items:flex-start;gap:10px}
+.metric-icon{font-size:20px}
+.metric-card h4{font-size:13px;font-weight:700;margin-bottom:3px}
+.metric-card p{font-size:11px;color:var(--text-secondary);line-height:1.4}
+.golden-rule{background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(245,158,11,0.03));border:2px solid rgba(245,158,11,0.25);border-radius:var(--radius-lg);padding:24px 18px;text-align:center;margin:20px 0}
+.golden-rule .emoji{font-size:28px;margin-bottom:8px}
+.golden-rule h3{font-size:18px;font-weight:800;color:var(--accent-warm);margin-bottom:6px}
+.golden-rule p{font-size:13px;color:var(--text-secondary);max-width:400px;margin:0 auto}
+.track-guide{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:14px}
+.track-guide h3{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.track-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px}
+.track-item:last-child{border-bottom:none}
+.track-item .t-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.track-item .t-name{font-weight:600;color:var(--text-primary)}
+.track-item .t-freq{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);margin-top:2px}
+.track-item .t-how{color:var(--text-secondary);margin-top:2px;line-height:1.4}
+.photo-guide{background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.15);border-radius:var(--radius);padding:14px;margin-top:14px}
+.photo-guide h4{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:6px}
+.photo-guide li{font-size:12px;color:var(--text-secondary);margin-bottom:3px;margin-left:14px;line-height:1.4}
+
+/* SNACK */
+.snack-card{background:linear-gradient(135deg,rgba(34,197,94,0.05),rgba(34,197,94,0.02));border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius);padding:14px;margin-top:14px}
+.snack-card h4{font-size:13px;font-weight:700;margin-bottom:3px;color:var(--success)}
+.snack-card .time{font-size:10px;color:var(--text-muted);margin-bottom:8px}
+
+/* YT LEGEND */
+.yt-legend{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-muted);margin-bottom:14px;padding:8px 12px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.12);border-radius:var(--radius-sm)}
+.yt-legend .yt-btn{width:24px;height:24px;font-size:10px;cursor:default;pointer-events:none}
+
+/* DASHBOARD */
+.dash-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+.dash-stat{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center}
+.dash-stat .ds-val{font-size:24px;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:-1px}
+.dash-stat .ds-label{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px}
+.dash-stat .ds-delta{font-size:10px;margin-top:2px}
+.dash-stat .ds-delta.pos{color:var(--success)}.dash-stat .ds-delta.neg{color:var(--danger)}.dash-stat .ds-delta.neu{color:var(--text-muted)}
+.dash-chart{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dash-chart h3{font-size:13px;font-weight:700;margin-bottom:10px}
+.dash-chart svg{min-width:500px}
+.dash-bars{display:flex;flex-direction:column;gap:8px}
+.dash-bar-row{display:flex;align-items:center;gap:6px}
+.dash-bar-row .db-name{font-size:11px;color:var(--text-secondary);width:80px;flex-shrink:0}
+.dash-bar-row .db-track{flex:1;height:18px;background:var(--bg-secondary);border-radius:9px;overflow:hidden}
+.dash-bar-row .db-fill{height:100%;border-radius:9px;display:flex;align-items:center;padding-left:6px;font-size:10px;font-weight:600;color:#fff;transition:width 0.5s}
+.dash-bar-row .db-pct{font-size:10px;color:var(--text-muted);width:36px;text-align:right}
+.dash-refresh{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-secondary);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;touch-action:manipulation;width:100%}
+.dash-refresh:active{background:var(--border)}
+.dash-loading{text-align:center;padding:30px;color:var(--text-muted);font-size:13px}
+.sheets-open{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 20px;border-radius:var(--radius);border:2px solid var(--success);background:rgba(34,197,94,0.08);color:var(--success);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s;text-decoration:none;width:100%;touch-action:manipulation}
+.sheets-open:active{background:var(--success);color:#000}
+.sheets-btn{display:none}
+
+.section-heading{font-size:20px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px}
+.section-sub{font-size:12px;color:var(--text-secondary);margin-bottom:20px}
+.divider{height:1px;background:var(--border);margin:20px 0}
+.footer-note{text-align:center;padding:20px 0;font-size:10px;color:var(--text-muted)}
+</style>
+</head>
+<body>
+
+<header class="header"><div class="header-inner">
+  <div class="logo">PROJE <span>ALPER</span></div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showPage('overview',this)"><span class="nav-icon">📊</span>Genel</button>
+    <button class="nav-btn" onclick="showPage('training',this)"><span class="nav-icon">💪</span>Antrenman</button>
+    <button class="nav-btn" onclick="showPage('nutrition',this)"><span class="nav-icon">🥗</span>Beslenme</button>
+    <button class="nav-btn" onclick="showPage('posture',this)"><span class="nav-icon">🪑</span>Postür</button>
+    <button class="nav-btn" onclick="showPage('sleep',this)"><span class="nav-icon">😴</span>Uyku</button>
+    <button class="nav-btn" onclick="showPage('tracking',this)"><span class="nav-icon">🎯</span>Takip</button>
+  </nav>
+</div></header>
+
+<main class="main">
+
+<!-- ==================== GENEL BAKIŞ ==================== -->
+<div class="page active" id="page-overview">
+  <h2 class="section-heading">Dönüşüm Kontrol Paneli</h2>
+  <p class="section-sub">178 cm · 100 kg → 80 kg · 37 yaş · Bel: 115 cm · Sedanter → Atletik</p>
+
+  <div class="beer-selector">
+    <div class="beer-label">🍺 Günlük İçki <small>Tür seç, adet seç — kalori otomatik hesaplanır</small></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+      <button class="beer-btn" style="width:auto;padding:0 14px;font-size:13px;font-family:inherit" data-drink="bira" onclick="setDrinkType('bira')">🍺 Bira</button>
+      <button class="beer-btn" style="width:auto;padding:0 14px;font-size:13px;font-family:inherit" data-drink="sarap" onclick="setDrinkType('sarap')">🍷 Şarap</button>
+      <button class="beer-btn" style="width:auto;padding:0 14px;font-size:13px;font-family:inherit" data-drink="cin" onclick="setDrinkType('cin')">🥃 Cin&Tonik</button>
+      <button class="beer-btn" style="width:auto;padding:0 14px;font-size:13px;font-family:inherit" data-drink="raki" onclick="setDrinkType('raki')">🥂 Rakı</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--text-muted)" id="drink-portion-label">50cl kutu/şişe</span>
+      <div class="beer-btns">
+        <button class="beer-btn" data-beer="0" onclick="setBeer(0)">0</button>
+        <button class="beer-btn" data-beer="1" onclick="setBeer(1)">1</button>
+        <button class="beer-btn active" data-beer="2" onclick="setBeer(2)">2</button>
+        <button class="beer-btn" data-beer="3" onclick="setBeer(3)">3</button>
+        <button class="beer-btn" data-beer="4" onclick="setBeer(4)">4</button>
+      </div>
+      <div class="beer-info"><div class="cal" id="beer-cal-display">430</div><div class="cal-label">kcal / gün</div></div>
+    </div>
+    <div class="lock-row">
+      <label class="lock-toggle"><input type="checkbox" id="lock-checkbox" onchange="toggleLock()"><span class="lock-slider"></span></label>
+      <div class="lock-label"><strong>Açığı Sabitle (−500 kcal)</strong><br>Aktifken: içki değişince diyet ve porsiyonlar otomatik ayarlanır, açık hep −500 kalır.</div>
+      <span class="lock-status off" id="lock-status">SERBEST</span>
+    </div>
+  </div>
+
+  <div class="grid-4">
+    <div class="stat-box"><div class="stat-value" id="stat-tdee">2650</div><div class="stat-label">Günlük TDEE</div></div>
+    <div class="stat-box"><div class="stat-value" id="stat-food" style="color:var(--success)">1720</div><div class="stat-label">Yiyecek kcal</div></div>
+    <div class="stat-box"><div class="stat-value" id="stat-deficit" style="color:var(--danger)">-500</div><div class="stat-label">Günlük Açık</div></div>
+    <div class="stat-box"><div class="stat-value" id="stat-weeks" style="color:var(--accent)">40</div><div class="stat-label">Hafta (Hedef)</div></div>
+  </div>
+  <div style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-bottom:6px"><span>100 kg</span><span id="week-loss-label"></span><span>80 kg</span></div>
+    <div class="timeline-bar"><div class="timeline-fill" id="timeline-fill" style="width:5%"></div></div>
+    <div style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-secondary)">Tahmini bitiş: <strong id="target-date" style="color:var(--text-primary)"></strong></div>
+  </div>
+  <div id="warning-box" class="info-box red" style="margin-top:0;display:none"><div class="icon">⚠️</div><div class="content" id="warning-text"></div></div>
+
+  <!-- LIVE DASHBOARD -->
+  <div class="divider"></div>
+  <h2 class="section-heading">İlerleme Dashboard</h2>
+  <p class="section-sub">Google Sheets'ten canlı veri · Sayfayı yenile = güncel veri</p>
+  <div id="dash-content"><div class="dash-loading" id="dash-loading">📡 Google Sheets'ten veri çekiliyor...</div></div>
+  <div style="display:flex;flex-direction:column;gap:8px;margin:16px 0">
+    <button class="dash-refresh" onclick="loadAllData()">🔄 Veriyi Yenile</button>
+    <a class="sheets-open" href="#" target="_blank" rel="noopener" id="sheets-edit-link">📊 Google Sheets'i Aç</a>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-heading">Plan Özeti</h2>
+  <div class="grid-3" style="margin-top:12px">
+    <div class="card" style="border-left:3px solid var(--accent)"><div class="card-title" style="font-size:14px">🏋️ Antrenman</div><p style="font-size:12px;color:var(--text-secondary);margin-top:6px;line-height:1.6">Pzt / Çar / Cum / Pzr · 17:00 · Omuz odaklı · 3 fazlı · Video rehberli</p></div>
+    <div class="card" style="border-left:3px solid var(--success)"><div class="card-title" style="font-size:14px">🥗 Beslenme</div><p style="font-size:12px;color:var(--text-secondary);margin-top:6px;line-height:1.6">2 öğün · Fast food azaltma · Dinamik porsiyonlar</p></div>
+    <div class="card" style="border-left:3px solid var(--accent-warm)"><div class="card-title" style="font-size:14px">🪑 Postür + Uyku</div><p style="font-size:12px;color:var(--text-secondary);margin-top:6px;line-height:1.6">Her gün postür · Uyku 03:00→00:00</p></div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="info-box green" style="margin-bottom:12px"><div class="icon">💡</div><div class="content" id="alcohol-note-bottom"></div></div>
+  <div class="info-box amber"><div class="icon">📋</div><div class="content">
+    <strong>Alper'e Özel Notlar</strong>
+    <strong style="font-size:13px;margin-top:8px">Stres (7/10):</strong> Yüksek stres = kortizol = karın yağı. Antrenman + uyku düzeni bunu düşürecek, sabırlı ol.<br>
+    <strong style="font-size:13px;margin-top:4px">Elektronik sigara:</strong> Kardiyo kapasiteni etkiliyor. Plan koşuya zorlamıyor, yürüyüşle başlıyor.<br>
+    <strong style="font-size:13px;margin-top:4px">Kan tahlili:</strong> Başlamadan önce mutlaka yaptır — açlık kan şekeri, HbA1c, karaciğer, tiroid.
+  </div></div>
+</div>
+
+<!-- ==================== ANTRENMAN ==================== -->
+<div class="page" id="page-training">
+  <h2 class="section-heading">Antrenman Programı</h2>
+  <p class="section-sub">Pzt · Çar · Cum · Pzr (17:00) — Omuz genişletme odaklı</p>
+  <div class="yt-legend"><a class="yt-btn" style="pointer-events:none"><svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg></a><span>▶ butonlarından doğru form videolarını izleyebilirsin</span></div>
+
+  <div id="training-content"></div>
+</div>
+
+<!-- ==================== BESLENME ==================== -->
+<div class="page" id="page-nutrition">
+  <h2 class="section-heading">Beslenme Planı</h2>
+  <p class="section-sub">Protein ağırlıklı · Porsiyonlar otomatik güncellenir</p>
+  <div class="meal-toggle">
+    <button class="meal-toggle-btn active" onclick="setMealCount(2)">2 Öğün</button>
+    <button class="meal-toggle-btn" onclick="setMealCount(3)">3 Öğün</button>
+  </div>
+
+  <div class="info-box amber"><div class="icon">🍺</div><div class="content" id="nutrition-beer-note"></div></div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon" style="background:rgba(59,130,246,0.1);color:var(--accent)">📊</div><div><div class="card-title">Günlük Makro Dağılımı</div><div class="card-subtitle" id="macro-subtitle"></div></div></div>
+    <div class="macro-row"><span class="macro-label">Protein</span><div class="macro-bar"><div class="macro-fill protein" id="macro-bar-p"></div></div><span class="macro-val" id="macro-val-p"></span></div>
+    <div class="macro-row"><span class="macro-label">Karb</span><div class="macro-bar"><div class="macro-fill carb" id="macro-bar-c"></div></div><span class="macro-val" id="macro-val-c"></span></div>
+    <div class="macro-row"><span class="macro-label">Yağ</span><div class="macro-bar"><div class="macro-fill fat" id="macro-bar-f"></div></div><span class="macro-val" id="macro-val-f"></span></div>
+  </div>
+  <div id="meal-plan-2"></div>
+  <div id="meal-plan-3" style="display:none"></div>
+  <div class="snack-card"><h4>🥜 Ara Öğün (İsteğe Bağlı)</h4><div class="time">15:30–16:30 · Antrenmandan önce lazımsa</div>
+    <p style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;margin-top:6px">Birini seç:</p>
+    <div class="meal-item"><span>1 muz + 5-6 badem</span><span class="kcal">~160 kcal</span></div>
+    <div class="meal-item"><span>Süzme yoğurt (150g) + bal</span><span class="kcal">~130 kcal</span></div>
+    <div class="meal-item"><span>Tam buğday ekmek + fıstık ezmesi</span><span class="kcal">~200 kcal</span></div>
+    <p style="font-size:11px;color:var(--text-muted);margin-top:10px">⚠️ Yersen akşam porsiyonunu küçült.</p>
+  </div>
+  <div class="info-box blue" style="margin-top:16px"><div class="icon">💡</div><div class="content"><strong>İpuçları</strong>Sipariş: ızgara/fırın seç, pilav yerine salata, sos kenarda. Basit yemek: tavuk doğra, tavada pişir, yanına bulgur + salata = 15 dk. Her içki için 1 bardak su. Kahveleri 15:00'ten sonra içme.</div></div>
+</div>
+
+<!-- ==================== POSTÜR ==================== -->
+<div class="page" id="page-posture">
+  <h2 class="section-heading">Postür Düzeltme Protokolü</h2>
+  <p class="section-sub">Kifoz · Forward head · Kalça fleksör · Düşük omuz</p>
+  <div class="yt-legend"><a class="yt-btn" style="pointer-events:none"><svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg></a><span>▶ butonlarından videoları izleyebilirsin</span></div>
+  <div class="info-box green"><div class="icon">🎯</div><div class="content"><strong>HER GÜN — Antrenman günleri dahil</strong>Sabah 10 dk + Saat başı 2 dk (10:00–17:00 = 7 mola) + Akşam 5 dk. 8+ saat bilgisayar başında — saat başı mola en kritik. Telefonuna alarm kur.</div></div>
+  <div id="posture-content"></div>
+</div>
+
+<!-- ==================== UYKU ==================== -->
+<div class="page" id="page-sleep">
+  <h2 class="section-heading">Uyku & Sirkadiyen Düzeltme</h2>
+  <p class="section-sub">03:00–11:00 → 00:00–08:00</p>
+  <div class="info-box amber"><div class="icon">🍺</div><div class="content" style="font-size:13px">Son içkini en geç 22:00'da bitir — yatmadan en az 2 saat boşluk bırak.</div></div>
+  <div class="card"><div class="card-header"><div class="card-icon" style="background:rgba(59,130,246,0.1);color:var(--accent)">🕐</div><div><div class="card-title">6 Haftalık Uyku Kaydırma</div><div class="card-subtitle">Haftada 30 dk</div></div></div>
+    <div class="sleep-week"><span class="sleep-wk">Hafta 1</span><span class="sleep-action">30 dk öne çek, alarm kur</span><span class="sleep-time">03:00→02:30 / 10:30</span></div>
+    <div class="sleep-week"><span class="sleep-wk">Hafta 2</span><span class="sleep-action">30 dk daha, ekranı yatmadan 45 dk önce kes</span><span class="sleep-time">02:30→02:00 / 10:00</span></div>
+    <div class="sleep-week"><span class="sleep-wk">Hafta 3</span><span class="sleep-action">Sabah güneş ışığına çık (10 dk)</span><span class="sleep-time">02:00→01:30 / 09:30</span></div>
+    <div class="sleep-week"><span class="sleep-wk">Hafta 4</span><span class="sleep-action">Sabah postür rutinini uyanınca yap</span><span class="sleep-time">01:30→01:00 / 09:00</span></div>
+    <div class="sleep-week"><span class="sleep-wk">Hafta 5</span><span class="sleep-action">Hafta sonu da aynı saati koru</span><span class="sleep-time">01:00→00:30 / 08:30</span></div>
+    <div class="sleep-week"><span class="sleep-wk">Hafta 6</span><span class="sleep-action">Hedefe ulaşıldı!</span><span class="sleep-time">00:00 / 08:00 ✓</span></div>
+  </div>
+  <div class="card" style="margin-top:16px"><div class="card-title" style="margin-bottom:12px">💤 Uyku Hijyeni</div>
+    <div class="move"><span class="move-name">Yatak odası: 18–20°C</span><span class="reps">her gece</span></div>
+    <div class="move"><span class="move-name">Ekranları yatmadan 45 dk önce kapat</span><span class="reps">her gece</span></div>
+    <div class="move"><span class="move-name">Kahve son saati: 15:00</span><span class="reps">kesin sınır</span></div>
+    <div class="move"><span class="move-name">Akşam postür rutini yatmadan 30 dk önce</span><span class="reps">her gece</span></div>
+    <div class="move"><span class="move-name">İçki → en geç 22:00</span><span class="reps">her gece</span></div>
+    <div class="move"><span class="move-name">E-sigara: yatmadan 1 saat önce bırak</span><span class="reps">her gece</span></div>
+  </div>
+</div>
+
+<!-- ==================== TAKİP & İLERLEME ==================== -->
+<div class="page" id="page-tracking">
+  <h2 class="section-heading">Takip & İlerleme</h2>
+  <p class="section-sub">Altın kural, kilometre taşları, takip rehberi</p>
+
+  <div class="golden-rule"><div class="emoji">🏆</div><h3>Altın Kural</h3><p>Arka arkaya 2 günü asla atlama. Monotonluk veya yorgunluk hissedersen yoğunluğu düşür ama rutini bozma.</p></div>
+
+  <div class="card" style="margin-top:20px"><div class="card-title" style="margin-bottom:12px">📊 Kilometre Taşları</div>
+    <div class="move"><span class="move-name">Hafta 0 — Kan tahlili yaptır</span><span class="reps" style="color:var(--danger);font-weight:700">BAŞLAMADAN ÖNCE</span></div>
+    <div class="move"><span class="move-name">Hafta 4 — Faz 1 tamamlandı</span><span class="reps badge-p1 phase-badge">FAZ 1 ✓</span></div>
+    <div class="move"><span class="move-name">Hafta 8 — Faz 2 tamamlandı</span><span class="reps badge-p2 phase-badge">FAZ 2 ✓</span></div>
+    <div class="move"><span class="move-name">Hafta 12 — ~6 kg, bel belirgin azalır</span><span class="reps" style="color:var(--success)">~94 kg</span></div>
+    <div class="move"><span class="move-name">Hafta 20 — ~10 kg</span><span class="reps" style="color:var(--success)">~90 kg</span></div>
+    <div class="move"><span class="move-name" id="milestone-final">Hafta 40 — Hedef!</span><span class="reps" style="color:var(--accent-warm);font-weight:700">80 kg 🎯</span></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">📋 Takip Rehberi</h3>
+  <div class="track-guide">
+    <h3>📊 Takip Edilecek Metrikler</h3>
+    <div class="track-item"><div class="t-icon">📏</div><div><div class="t-name">Bel Çevresi (ÖNCELİKLİ)</div><div class="t-freq">Haftada 1 · Pazartesi sabah</div><div class="t-how">Göbek hizasından, nefes verdikten sonra. Başlangıç: 115 cm.</div></div></div>
+    <div class="track-item"><div class="t-icon">⚖️</div><div><div class="t-name">Tartı</div><div class="t-freq">Haftada 1 · Pazartesi sabah, aç karnına</div><div class="t-how">Aynı koşullarda. Haftalık trende bak.</div></div></div>
+    <div class="track-item"><div class="t-icon">💪</div><div><div class="t-name">Antrenman Günlüğü</div><div class="t-freq">Her antrenman günü</div><div class="t-how">Gerçekte yaptığın tekrar sayılarını kaydet. Programdaki sayılar hedef.</div></div></div>
+    <div class="track-item"><div class="t-icon">📸</div><div><div class="t-name">İlerleme Fotoğrafı</div><div class="t-freq">Ayda 1</div><div class="t-how">Aynı ışık, açı, kıyafet. Önden + yandan.</div></div></div>
+    <div class="track-item"><div class="t-icon">🩸</div><div><div class="t-name">Kan Testi</div><div class="t-freq">Başlamadan önce + 3 ayda 1</div><div class="t-how">Açlık şekeri, HbA1c, karaciğer, tiroid, lipid.</div></div></div>
+  </div>
+
+  <div class="photo-guide">
+    <h4>📸 Fotoğraf Çekme Rehberi</h4>
+    <ul>
+      <li>Aynı oda, aynı ışık kaynağı, aynı saat</li>
+      <li>Dar tişört veya çıplak gövde</li>
+      <li>3 açı: önden, yandan (sağ), arkadan</li>
+      <li>Kamerayı göğüs hizasına sabitle (zamanlayıcı kullan)</li>
+      <li>Telefonda ayrı bir albüm oluştur: "Dönüşüm"</li>
+    </ul>
+  </div>
+</div>
+
+</main>
+<div class="footer-note">PROJE ALPER — Kişiselleştirilmiş Dönüşüm Planı</div>
+
+<script>
+const YT_SVG='<svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>';
+function ytUrl(q){return'https://www.youtube.com/results?search_query='+encodeURIComponent(q+' proper form tutorial')}
+function ytBtn(q){return`<a class="yt-btn" href="${ytUrl(q)}" target="_blank" rel="noopener" title="${q}">${YT_SVG}</a>`}
+function exRow(n,d,q){return`<div class="exercise">${ytBtn(q||n)}<span class="name">${n}</span><span class="detail">${d}</span></div>`}
+function moveRow(n,r,q){return`<div class="move">${ytBtn(q||n)}<span class="move-name">${n}</span><span class="reps">${r}</span></div>`}
+
+// ===== TRAINING — shoulder-focused =====
+const phases=[
+{num:1,name:'Temel',cls:'phase-1',weeks:'Hafta 1–4 · Form inşası · Düşük yoğunluk',
+ days:[
+  {day:'Pazartesi',type:'Push (Omuz+)',focus:'Göğüs · Omuz · Triceps',warmup:'5 dk koşu bandı (yavaş) + 10 kol çevirme + 10 gövde rotasyonu',open:true,
+   ex:[['Dumbbell Shoulder Press (4-8kg)','3 × 12','dumbbell shoulder press'],['Şınav','3 × 12','push up form'],['Dumbbell Chest Press (4-8kg)','3 × 10','dumbbell chest press'],['Dumbbell Lateral Raise (2-3kg)','3 × 15','dumbbell lateral raise'],['Triceps Dips (sandalyede)','3 × 8','chair tricep dips'],['Diamond Push-up','2 × 8','diamond push up']]},
+  {day:'Çarşamba',type:'Pull (Omuz+)',focus:'Sırt · Biceps · Arka omuz',warmup:'5 dk koşu bandı + kol/omuz mobilite',
+   ex:[['Barfiks — negatif','3 × 5','negative pull up'],['Dumbbell Row (4-8kg, her kol)','3 × 12','single arm dumbbell row'],['Face Pull (dumbbell/band)','3 × 15','face pull dumbbell'],['Dumbbell Bicep Curl (2-3kg)','3 × 12','dumbbell bicep curl'],['Superman','3 × 10','superman exercise'],['Dead Hang','3 × 20sn','dead hang']]},
+  {day:'Cuma',type:'Legs',focus:'Bacak · Kalça',warmup:'5 dk koşu bandı + dinamik bacak germe + kalça çevirme',
+   ex:[['Bodyweight Squat','3 × 15','bodyweight squat form'],['Dumbbell Goblet Squat (4-8kg)','3 × 12','goblet squat dumbbell'],['Lunge (her bacak)','3 × 10','forward lunge form'],['Glute Bridge','3 × 15','glute bridge'],['Calf Raise','3 × 20','calf raise'],['Wall Sit','3 × 30sn','wall sit']]},
+  {day:'Pazar',type:'Full Body + Kardiyo',focus:'Tüm vücut + Omuz ekstra',warmup:'5 dk koşu bandı (hafif)',
+   ex:[['Push-up','2 × 10','push up'],['Dumbbell Row','2 × 10','dumbbell row'],['Dumbbell Lateral Raise (2-3kg)','2 × 15','lateral raise'],['Bodyweight Squat','2 × 15','squat'],['Plank','3 × 30sn','plank'],['Mountain Climber','3 × 20','mountain climbers'],['Koşu Bandı — tempolu yürüyüş','25 dk · 5.5–6 km/s','treadmill walking workout']]}
+]},
+{num:2,name:'Gelişim',cls:'phase-2',weeks:'Hafta 5–8 · Artan hacim · Superset',
+ days:[
+  {day:'Pazartesi',type:'Push (Omuz+)',focus:'Göğüs · Omuz · Triceps',warmup:'5 dk koşu bandı + 15 kol çevirme + 10 hafif şınav',
+   ex:[['Dumbbell Shoulder Press (4-8kg)','4 × 12','dumbbell shoulder press'],['Şınav','4 × 12','push up'],['Decline Push-up','3 × 10','decline push up'],['Dumbbell Lateral Raise (2-3kg)','4 × 15','lateral raise'],['Dumbbell Chest Fly (2-3kg)','3 × 12','dumbbell chest fly'],['Pike Push-up','3 × 8','pike push up'],['Triceps Dips','3 × 12','tricep dips']]},
+  {day:'Çarşamba',type:'Pull (Omuz+)',focus:'Sırt · Biceps · Arka omuz',warmup:'5 dk koşu bandı + omuz mobilite',
+   ex:[['Barfiks','3 × 6–8','pull up'],['Chin-up (negatif)','3 × 5','negative chin up'],['Dumbbell Row (4-8kg)','4 × 12','dumbbell row'],['Face Pull','4 × 15','face pull'],['Dumbbell Hammer Curl (4-8kg)','3 × 10','hammer curl'],['Inverted Row','3 × 8','inverted row at home'],['Band Pull-Apart','3 × 20','band pull apart']]},
+  {day:'Cuma',type:'Legs',focus:'Bacak · Kalça',warmup:'5 dk koşu bandı + dinamik gerdirme',
+   ex:[['Bulgarian Split Squat (her bacak)','3 × 10','bulgarian split squat'],['Dumbbell Sumo Squat (4-8kg)','3 × 15','sumo squat dumbbell'],['Step-up (sandalye)','3 × 10','step up exercise'],['Single Leg Glute Bridge','3 × 12','single leg glute bridge'],['Calf Raise (dumbbell)','3 × 20','calf raise dumbbell'],['Wall Sit','3 × 45sn','wall sit']]},
+  {day:'Pazar',type:'Full Body + Kardiyo',focus:'Devre + Omuz ekstra',warmup:'3 dk koşu bandı',note:'Devre: 7 hareket arka arkaya, 90 sn dinlen, 3 tur.',
+   ex:[['Push-up','× 12','push up'],['Dumbbell Row','× 12','dumbbell row'],['Lateral Raise','× 15','lateral raise'],['Squat','× 15','squat'],['Plank','45 sn','plank'],['Burpee','× 8','burpee'],['Koşu Bandı — aralıklı','25 dk · 2dk hızlı / 1dk yavaş','treadmill interval training']]}
+]},
+{num:3,name:'İleri',cls:'phase-3',weeks:'Hafta 9+ · Yüksek yoğunluk · HIIT',
+ days:[
+  {day:'Pazartesi',type:'Push (Omuz+)',focus:'Göğüs · Omuz · Triceps',warmup:'5 dk koşu bandı + tam vücut mobilite + 10 hafif şınav',
+   ex:[['Dumbbell Arnold Press (4-8kg)','4 × 12','arnold press dumbbell'],['Archer Push-up (her kol)','3 × 8','archer push up'],['Decline Push-up','4 × 12','decline push up'],['Dumbbell Lateral Raise (4-8kg)','4 × 15','lateral raise heavy'],['Push-up to Side Plank','3 × 8','push up to side plank'],['Triceps Diamond Push-up','3 × 12','diamond push up'],['Pike Push-up','3 × 10','pike push up']]},
+  {day:'Çarşamba',type:'Pull (Omuz+)',focus:'Sırt · Biceps · Arka omuz',warmup:'5 dk koşu bandı + omuz mobilite',
+   ex:[['Barfiks','4 × 8–10','pull up'],['Commando Pull-up','3 × 6','commando pull up'],['Dumbbell Row (tempo 3-1-1)','4 × 12','tempo dumbbell row'],['Face Pull','4 × 15','face pull'],['Band Pull-Apart','3 × 20','band pull apart'],['Dumbbell Bicep Curl (4-8kg)','3 × 12','bicep curl'],['Towel Hang','3 × max','towel hang grip']]},
+  {day:'Cuma',type:'Legs',focus:'Bacak · Kalça',warmup:'5 dk koşu bandı + kalça mobilite + hamstring germe',
+   ex:[['Pistol Squat — destekli','3 × 5','assisted pistol squat'],['Bulgarian Split Squat (4-8kg)','3 × 12','bulgarian split squat dumbbell'],['Dumbbell RDL (4-8kg)','3 × 12','dumbbell romanian deadlift'],['Jump Squat','3 × 10','jump squat'],['Nordic Hamstring (negatif)','3 × 5','nordic hamstring curl beginner'],['Calf Raise (tek bacak)','3 × 15','single leg calf raise']]},
+  {day:'Pazar',type:'Full Body + HIIT',focus:'AMRAP + Omuz finisher',warmup:'3 dk koşu bandı + dinamik mobilite',note:'AMRAP 20 dk + omuz finisher.',
+   ex:[['Push-up','× 10','push up'],['Barfiks','× 5','pull up'],['Squat Jump','× 10','jump squat'],['Plank','45 sn','plank'],['Mountain Climber','× 20','mountain climbers'],['Burpee','× 5','burpee'],['Lateral Raise (finisher)','3 × 20','lateral raise burnout'],['Koşu Bandı — HIIT','30 dk · 1dk sprint / 1dk yürüyüş','treadmill HIIT workout']]}
+]}
+];
+
+function renderTraining(){
+  let h='';
+  phases.forEach(ph=>{
+    h+=`<div class="phase-card ${ph.cls}"><div class="phase-title"><span class="phase-badge">FAZ ${ph.num}</span> ${ph.name}</div><div class="phase-weeks">${ph.weeks}</div>`;
+    ph.days.forEach((d,di)=>{
+      if(di===1) h+=`<div class="rest-day">😴 Salı — Dinlenme + <strong style="color:var(--success)">Postür (sabah + saat başı + akşam)</strong></div>`;
+      if(di===2) h+=`<div class="rest-day">😴 Perşembe — Dinlenme + <strong style="color:var(--success)">Postür (sabah + saat başı + akşam)</strong></div>`;
+      if(di===3) h+=`<div class="rest-day">😴 Cumartesi — Serbest + <strong style="color:var(--success)">Postür (sabah + akşam)</strong></div>`;
+      h+=`<div class="day-block${d.open?' open':''}"><div class="day-header" onclick="toggleDay(this)"><div><span class="day-name">${d.day} — ${d.type} <span class="day-tag train">ANTRENMAN</span><span class="day-tag posture">POSTÜR</span></span><br><span class="day-focus">${d.focus} · 17:00</span></div><div class="day-toggle">▼</div></div><div class="day-content">`;
+      h+=`<div class="warmup-tag">🔥 Isınma: ${d.warmup}</div>`;
+      if(d.note) h+=`<p style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">${d.note}</p>`;
+      d.ex.forEach(e=>{h+=exRow(e[0],e[1],e[2])});
+      h+=`<div class="posture-reminder">🪑 Sabah + akşam postür rutinini de yap</div></div></div>`;
+    });
+    h+=`</div>`;
+  });
+  document.getElementById('training-content').innerHTML=h;
+}
+
+// ===== POSTURE — shoulder-focused additions =====
+const postureData=[
+  {title:'🌅 Sabah Rutini',dur:'10 dk',moves:[['Cat-Cow','10 tekrar','cat cow stretch'],['Thoracic Extension (foam roller/havlu)','30sn × 3','thoracic extension foam roller'],['Chin Tuck','15 tekrar','chin tuck exercise'],['Chest Doorway Stretch','30sn × 2 (her kol)','doorway chest stretch'],['Shoulder Dislocate (havlu/çubuk)','10 tekrar','shoulder dislocate stretch'],['Hip Flexor Stretch (yarım diz çökme)','30sn × 2 (her bacak)','hip flexor stretch kneeling'],['Dead Hang','30sn','dead hang form']]},
+  {title:'🖥️ Saat Başı Masa Molası (10:00–17:00)',dur:'2 dk × 7 mola',moves:[['Chin Tuck','5 tekrar','chin tuck'],['Shoulder Shrugs + Rolls','10 tekrar','shoulder shrugs and rolls'],['Seated Thoracic Rotation','5 her yön','seated thoracic rotation'],['Standing Hip Flexor Stretch','20sn her bacak','standing hip flexor stretch']]},
+  {title:'🌙 Akşam Rutini',dur:'5 dk',moves:[['Child\'s Pose','30sn','child pose yoga'],['Scorpion Stretch','10 her yön','scorpion stretch'],['Figure-4 Stretch','30sn her bacak','figure 4 stretch'],['Neck Stretch','20sn her yön','neck side stretch'],['Wall Angel','10 tekrar','wall angel exercise']]}
+];
+function renderPosture(){
+  let h='';
+  postureData.forEach(b=>{h+=`<div class="routine-block"><h4>${b.title} <span class="dur">${b.dur}</span></h4>`;b.moves.forEach(m=>{h+=moveRow(m[0],m[1],m[2])});h+='</div>'});
+  document.getElementById('posture-content').innerHTML=h;
+}
+
+// ===== STATE & CALC =====
+let beerCount=2,mealCount=2,lockMode=false;
+const DRINK_TYPES={
+  bira:{kcal:215,label:'50cl kutu/şişe',name:'Bira'},
+  sarap:{kcal:120,label:'1 kadeh (150ml)',name:'Şarap'},
+  cin:{kcal:170,label:'1 bardak (250ml)',name:'Cin&Tonik'},
+  raki:{kcal:120,label:'1 kadeh (50ml+su)',name:'Rakı'}
+};
+let drinkType='bira';
+function getDrinkKcal(){return DRINK_TYPES[drinkType].kcal}
+const TDEE=2650,FOOD_BASE=1720,FIXED_DEFICIT=500,MIN_FOOD=1200,LOSS_KG=20,TARGET_KG=80;
+
+const meals2={lunch:{title:'🥗 Öğle Yemeği',time:'13:00–14:00 · Antrenmandan önce',pct:0.58,protPct:0.55,items:[{name:'Protein: Tavuk göğsü / somon / ton balığı / hindi / bonfile / karides',base:200,unit:'g'},{name:'Karbonhidrat: Bulgur / pirinç / tam buğday makarna / kinoa / tatlı patates',base:150,unit:'g'},{name:'Sebze: Karışık salata / brokoli / ıspanak / kabak / yeşil fasulye (zeytinyağlı)',base:null,unit:'1 tabak'},{name:'Yoğurt / ayran',base:200,unit:'g'},{name:'Sağlıklı yağ: Ceviz / badem / avokado',base:null,unit:'5–6 adet veya ¼ avokado'}]},dinner:{title:'🍽️ Akşam Yemeği',time:'19:30–20:30 · Antrenman sonrası',pct:0.42,protPct:0.45,items:[{name:'Protein: Somon / köfte / yumurta (3-4) / tavuk but / mercimek köftesi / karides',base:180,unit:'g'},{name:'Karbonhidrat: Patates / tam buğday makarna / pirinç / tatlı patates / yulaf',base:120,unit:'g'},{name:'Sebze: Brokoli / karnabahar / ıspanak / patlıcan / domates-biber sote',base:null,unit:'1 porsiyon'},{name:'Süt ürünü: Lor peyniri / süzme yoğurt / beyaz peynir',base:150,unit:'g'}]}};
+const meals3={breakfast:{title:'🌅 Kahvaltı',time:'09:30–10:00',pct:0.22,protPct:0.18,items:[{name:'Yumurta (haşlanmış / çılbır / menemen)',base:3,unit:' adet',countable:true},{name:'Ekmek: Tam buğday / çavdar / yulaf ekmeği',base:2,unit:' dilim',countable:true},{name:'Peynir: Beyaz / lor / kaşar / çökelek',base:50,unit:'g'},{name:'Taze sebze: Domates / salatalık / biber / roka',base:null,unit:'birkaç dilim'}]},lunch:{title:'🥗 Öğle',time:'13:30–14:30',pct:0.42,protPct:0.42,items:[{name:'Protein: Tavuk göğsü / ton balığı / hindi / bonfile / karides',base:150,unit:'g'},{name:'Karbonhidrat: Bulgur / pirinç / tam buğday makarna / kinoa',base:100,unit:'g'},{name:'Sebze: Karışık salata / brokoli / kabak / yeşil fasulye',base:null,unit:'1 tabak'},{name:'Yoğurt / ayran',base:150,unit:'g'}]},dinner:{title:'🍽️ Akşam',time:'19:30–20:30',pct:0.36,protPct:0.40,items:[{name:'Protein: Somon / köfte / yumurta / tavuk / mercimek köftesi',base:150,unit:'g'},{name:'Karbonhidrat: Patates / makarna / pirinç / tatlı patates',base:80,unit:'g'},{name:'Sebze: Brokoli / karnabahar / ıspanak / patlıcan sote',base:null,unit:'1 porsiyon'},{name:'Süt ürünü: Süzme yoğurt / lor / beyaz peynir',base:100,unit:'g'}]}};
+
+function calcPlan(bc){
+  const beerCals=bc*getDrinkKcal();
+  let foodCals=lockMode?Math.max(MIN_FOOD,TDEE-FIXED_DEFICIT-beerCals):FOOD_BASE;
+  const deficit=TDEE-foodCals-beerCals,totalIntake=foodCals+beerCals;
+  let wl=deficit>0?(deficit*7)/7700:0,weeks=wl>0?Math.ceil(LOSS_KG/wl):999;
+  if(weeks>999)weeks=999;
+  const pG=TARGET_KG*2,pC=pG*4,fC=Math.round(foodCals*0.25),fG=Math.round(fC/9),cC=foodCals-pC-fC,cG=Math.max(0,Math.round(cC/4));
+  const pP=Math.round((pC/foodCals)*100),fP=Math.round((fC/foodCals)*100),cP=100-pP-fP;
+  return{tdee:TDEE,beerCals,foodCals,totalIntake,deficit,weeklyLoss:Math.round(wl*100)/100,weeks,proteinG:pG,carbG:cG,fatG:fG,proteinPct:pP,carbPct:cP,fatPct:fP,ratio:foodCals/FOOD_BASE};
+}
+
+function renderMealCard(meal,foodCals,proteinG,ratio){
+  const kcal=Math.round(foodCals*meal.pct),prot=Math.round(proteinG*meal.protPct);
+  let h=`<div class="meal-card"><h4>${meal.title}</h4><div class="time">${meal.time}</div>`;
+  meal.items.forEach(it=>{
+    let port;
+    if(it.base===null){port=it.unit}
+    else if(it.countable){
+      // FIX: countable items (eggs, bread) round to nearest 1, minimum 1
+      const sc=Math.max(1,Math.round(it.base*ratio));
+      const ch=sc!==it.base;
+      port=sc+it.unit;
+      if(ch)port+=` <span style="font-size:11px;color:var(--accent-warm)">(baz: ${it.base}${it.unit})</span>`;
+    } else {
+      // gram items round to nearest 5
+      const sc=Math.max(5,Math.round(it.base*ratio/5)*5);
+      const ch=ratio<0.97||ratio>1.03;
+      port=sc+it.unit;
+      if(ch)port+=` <span style="font-size:11px;color:var(--accent-warm)">(baz: ${it.base}${it.unit})</span>`;
+    }
+    h+=`<div class="meal-item"><span>${it.name}</span><span class="kcal">${port}</span></div>`;
+  });
+  h+=`<div class="meal-total">~${kcal} kcal · P: ${prot}g</div></div>`;return h;
+}
+function renderMeals(p){
+  document.getElementById('meal-plan-2').innerHTML=`<h3 style="font-size:16px;font-weight:700;margin-bottom:12px">📋 2 Öğün (Kahvaltısız)</h3><div class="grid-2">${renderMealCard(meals2.lunch,p.foodCals,p.proteinG,p.ratio)}${renderMealCard(meals2.dinner,p.foodCals,p.proteinG,p.ratio)}</div>`;
+  document.getElementById('meal-plan-3').innerHTML=`<h3 style="font-size:16px;font-weight:700;margin-bottom:12px">📋 3 Öğün</h3><div class="grid-3">${renderMealCard(meals3.breakfast,p.foodCals,p.proteinG,p.ratio)}${renderMealCard(meals3.lunch,p.foodCals,p.proteinG,p.ratio)}${renderMealCard(meals3.dinner,p.foodCals,p.proteinG,p.ratio)}</div>`;
+}
+
+function updateAll(){
+  const p=calcPlan(beerCount),z=calcPlan(0);
+  document.getElementById('stat-tdee').textContent=p.tdee;
+  document.getElementById('stat-food').textContent=p.foodCals;
+  document.getElementById('stat-deficit').textContent=p.deficit>0?'-'+p.deficit:(p.deficit===0?'0':'+'+Math.abs(p.deficit));
+  document.getElementById('stat-weeks').textContent=p.weeks<999?p.weeks:'∞';
+  document.getElementById('beer-cal-display').textContent=p.beerCals;
+  document.getElementById('week-loss-label').textContent=p.weeklyLoss>0?'Haftalık: ~'+p.weeklyLoss.toFixed(2)+' kg':'Haftalık kayıp yok';
+  document.getElementById('stat-deficit').style.color=p.deficit>300?'var(--danger)':(p.deficit>0?'var(--accent-warm)':'var(--text-muted)');
+  const now=new Date(),tgt=new Date(now.getTime()+p.weeks*7*86400000);
+  const mo=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  document.getElementById('target-date').textContent=p.weeks<999?mo[tgt.getMonth()]+' '+tgt.getFullYear():'Hesaplanamıyor';
+  document.getElementById('timeline-fill').style.width='5%';
+  const nb=document.getElementById('alcohol-note-bottom');
+  if(nb){
+    if(beerCount===0) nb.innerHTML='<strong>Alkolsüz mod</strong> — açık '+z.deficit+' kcal, hedef ~'+z.weeks+' hafta.';
+    else nb.innerHTML='<strong>Alkolsüz alternatif:</strong> İçkiyi bırakırsan '+p.beerCals+' kcal kazanır, hedefin ~'+p.weeks+' haftadan ~'+z.weeks+' haftaya düşer.';
+  }
+  const wb=document.getElementById('warning-box'),wt=document.getElementById('warning-text');wb.style.display='none';
+  if(p.deficit<200){wb.style.display='flex';if(p.deficit<=0)wt.innerHTML='<strong>Açık yok!</strong> Toplam ('+p.totalIntake+') ≥ TDEE ('+TDEE+').';else wt.innerHTML='<strong>Düşük açık!</strong> '+p.deficit+' kcal — '+p.weeks+' hafta.';}
+  if(lockMode&&p.foodCals<=MIN_FOOD&&beerCount>=3){wb.style.display='flex';wt.innerHTML='<strong>Yiyecek tabanı!</strong> '+beerCount+' içki ile yiyecek '+MIN_FOOD+' kcal\'e düştü.';}
+  document.getElementById('milestone-final').textContent=p.weeks<999?'Hafta '+p.weeks+' — Hedef!':'Hedef — ayarları değiştir';
+  document.getElementById('macro-subtitle').textContent='Yiyecek: '+p.foodCals+' · İçki: '+p.beerCals+' · Toplam: '+p.totalIntake+' kcal';
+  document.getElementById('macro-bar-p').style.width=p.proteinPct+'%';document.getElementById('macro-bar-p').textContent=p.proteinPct+'%';document.getElementById('macro-val-p').textContent=p.proteinG+'g';
+  document.getElementById('macro-bar-c').style.width=p.carbPct+'%';document.getElementById('macro-bar-c').textContent=p.carbPct+'%';document.getElementById('macro-val-c').textContent=p.carbG+'g';
+  document.getElementById('macro-bar-f').style.width=p.fatPct+'%';document.getElementById('macro-bar-f').textContent=p.fatPct+'%';document.getElementById('macro-val-f').textContent=p.fatG+'g';
+  if(beerCount===0)document.getElementById('nutrition-beer-note').innerHTML='İçki seçilmedi — tüm bütçe yiyeceğe ayrılmış.';
+  else{let x=lockMode?' <strong>Açık sabitlendi (−500)</strong> — porsiyonlar otomatik.':' Sayacı "Genel Bakış"tan değiştirebilirsin.';document.getElementById('nutrition-beer-note').innerHTML='Günde '+beerCount+' '+DRINK_TYPES[drinkType].name+' ('+p.beerCals+' kcal) dahil.'+x;}
+  const ls=document.getElementById('lock-status');if(lockMode){ls.textContent='−500 SABİT';ls.className='lock-status on'}else{ls.textContent='SERBEST';ls.className='lock-status off'}
+  renderMeals(p);
+}
+
+function setDrinkType(type){
+  drinkType=type;
+  document.querySelectorAll('[data-drink]').forEach(b=>{b.classList.toggle('active',b.dataset.drink===type)});
+  document.getElementById('drink-portion-label').textContent=DRINK_TYPES[type].label;
+  updateAll();
+}
+function setBeer(n){beerCount=n;document.querySelectorAll('[data-beer]').forEach(b=>{b.classList.toggle('active',parseInt(b.dataset.beer)===n)});updateAll()}
+// Init drink type button
+document.querySelector('[data-drink="bira"]').classList.add('active');
+function setMealCount(n){mealCount=n;document.querySelectorAll('.meal-toggle-btn').forEach((b,i)=>{b.classList.toggle('active',(i===0&&n===2)||(i===1&&n===3))});document.getElementById('meal-plan-2').style.display=n===2?'block':'none';document.getElementById('meal-plan-3').style.display=n===3?'block':'none';updateAll()}
+function toggleLock(){lockMode=document.getElementById('lock-checkbox').checked;updateAll()}
+function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
+function toggleDay(h){h.parentElement.classList.toggle('open')}
+
+renderTraining();renderPosture();updateAll();
+
+// ===== GOOGLE SHEETS DASHBOARD =====
+const SHEET_WEEKLY='https://docs.google.com/spreadsheets/d/e/2PACX-1vThdCSyNyAfIs4DEMoJnCo6OEt44hloTjotztqMqdPbSqGDkKECRBBHfkuimYXw8sX4XQS5mvAjsR97/pub?output=csv';
+const SHEET_TRAINING='https://docs.google.com/spreadsheets/d/e/2PACX-1vThdCSyNyAfIs4DEMoJnCo6OEt44hloTjotztqMqdPbSqGDkKECRBBHfkuimYXw8sX4XQS5mvAjsR97/pub?gid=23280774&single=true&output=csv';
+const SHEETS_EDIT='https://docs.google.com/spreadsheets/d/e/2PACX-1vThdCSyNyAfIs4DEMoJnCo6OEt44hloTjotztqMqdPbSqGDkKECRBBHfkuimYXw8sX4XQS5mvAjsR97/pubhtml';
+
+// Gösterge hareketler — antrenman günlüğündeki isimleriyle eşleşmeli
+const INDICATOR_EXERCISES=[
+  {name:'Şınav',key:'şınav',color:'var(--accent)'},
+  {name:'Barfiks',key:'barfiks',color:'var(--success)'},
+  {name:'Squat',key:'squat',color:'#a855f7'},
+  {name:'Lateral Raise',key:'lateral raise',color:'var(--accent-warm)'},
+  {name:'Plank (sn)',key:'plank',color:'#ec4899'},
+  {name:'Koşu Bandı (dk)',key:'koşu bandı',color:'#06b6d4'}
+];
+
+function parseCSV(text){
+  return text.split('\n').map(l=>l.split(',').map(c=>c.replace(/^"|"$/g,'').trim()));
+}
+
+function loadAllData(){
+  document.getElementById('dash-loading').style.display='block';
+  const el=document.getElementById('dash-content');
+  
+  Promise.all([
+    fetch(SHEET_WEEKLY).then(r=>r.ok?r.text():Promise.reject('Haftalık veri çekilemedi')),
+    fetch(SHEET_TRAINING).then(r=>r.ok?r.text():Promise.reject('Antrenman verisi çekilemedi')).catch(()=>null)
+  ]).then(([weeklyCSV, trainingCSV])=>{
+    const weeklyRows=parseCSV(weeklyCSV);
+    const trainingRows=trainingCSV?parseCSV(trainingCSV):null;
+    renderFullDashboard(weeklyRows, trainingRows);
+  }).catch(err=>{
+    el.innerHTML=`<div class="info-box red"><div class="icon">⚠️</div><div class="content"><strong>Veri çekilemedi</strong>${err}<br>Google Sheets "Web'de yayınla" aktif olmayabilir veya bağlantı sorunu olabilir.</div></div>`;
+  });
+}
+
+function renderFullDashboard(weeklyRows, trainingRows){
+  document.getElementById('dash-loading').style.display='none';
+  
+  // === PARSE WEEKLY ===
+  let hIdx=-1;
+  for(let i=0;i<Math.min(weeklyRows.length,10);i++){
+    if(weeklyRows[i][0]&&weeklyRows[i][0].toLowerCase().includes('hafta')){hIdx=i;break}
+  }
+  const weeks=[];
+  if(hIdx>=0){
+    for(let i=hIdx+1;i<weeklyRows.length;i++){
+      const r=weeklyRows[i];
+      if(!r[0]||!r[0].trim())continue;
+      weeks.push({label:r[0],date:r[1]||'',weight:parseFloat(r[2])||null,waist:parseFloat(r[3])||null});
+    }
+  }
+  const filled=weeks.filter(w=>w.weight||w.waist);
+  const START_W=100,START_WAIST=115;
+  const latest=filled.length>0?filled[filled.length-1]:{weight:START_W,waist:START_WAIST};
+  const latestW=latest.weight||START_W, latestWaist=latest.waist||START_WAIST;
+  const deltaW=latestW-START_W, deltaWaist=latestWaist-START_WAIST;
+  const weekNum=filled.length;
+
+  // === PARSE TRAINING — extract indicator exercises ===
+  let strengthData={};
+  if(trainingRows){
+    // Find rows matching indicator exercises, get their set values
+    // Columns: Tarih(0), Gün(1), Faz(2), Hareket(3), Set1(4), Set2(5), Set3(6)
+    const entries=[];
+    for(let i=0;i<trainingRows.length;i++){
+      const r=trainingRows[i];
+      if(!r[3])continue;
+      const name=r[3].toLowerCase();
+      const s1=parseFloat(r[4])||0, s2=parseFloat(r[5])||0, s3=parseFloat(r[6])||0;
+      if(s1===0&&s2===0&&s3===0)continue;
+      const avg=Math.round(((s1+(s2||s1)+(s3||s1))/(s3?3:s2?2:1))*10)/10;
+      entries.push({name,avg,date:r[0]||'',idx:i});
+    }
+    
+    // For each indicator, find first and last entries
+    INDICATOR_EXERCISES.forEach(ind=>{
+      const matches=entries.filter(e=>e.name.includes(ind.key));
+      if(matches.length>0){
+        strengthData[ind.key]={
+          first:matches[0].avg,
+          last:matches[matches.length-1].avg,
+          count:matches.length
+        };
+      }
+    });
+  }
+
+  let html='';
+
+  // === STAT CARDS ===
+  html+=`<div class="dash-stats">
+    <div class="dash-stat"><div class="ds-label">Tartı (kg)</div><div class="ds-val">${latestW}</div><div class="ds-delta ${deltaW<0?'pos':deltaW>0?'neg':'neu'}">${deltaW>0?'+':''}${deltaW.toFixed(1)} kg</div></div>
+    <div class="dash-stat"><div class="ds-label">Bel (cm)</div><div class="ds-val">${latestWaist}</div><div class="ds-delta ${deltaWaist<0?'pos':deltaWaist>0?'neg':'neu'}">${deltaWaist>0?'+':''}${deltaWaist.toFixed(0)} cm</div></div>
+    <div class="dash-stat"><div class="ds-label">Hafta</div><div class="ds-val" style="color:var(--accent)">${weekNum}</div><div class="ds-delta neu">/ 40</div></div>
+    <div class="dash-stat"><div class="ds-label">Hedef</div><div class="ds-val" style="color:var(--accent-warm)">80</div><div class="ds-delta neu">${(latestW-80).toFixed(1)} kg kaldı</div></div>
+  </div>`;
+
+  // === WEIGHT + WAIST TREND CHART ===
+  if(filled.length>=2){
+    const cW=680,cH=140,pL=45,pR=10,pT=10,pB=25;
+    const plW=cW-pL-pR,plH=cH-pT-pB;
+    const wVals=filled.map(w=>w.weight).filter(Boolean);
+    const wMin=Math.min(...wVals)-1,wMax=Math.max(...wVals)+1;
+    const pts=filled.length;
+    let wLine='',waistLine='';
+    filled.forEach((w,i)=>{
+      const x=pL+(i/(pts-1))*plW;
+      if(w.weight){const y=pT+plH-(((w.weight-wMin)/(wMax-wMin))*plH);wLine+=(wLine?'L':'M')+x.toFixed(0)+','+y.toFixed(0)+' ';}
+      if(w.waist){const wN=(w.waist-(START_WAIST-10))/25;const y=pT+plH-(wN*plH);waistLine+=(waistLine?'L':'M')+x.toFixed(0)+','+Math.max(pT,Math.min(pT+plH,y)).toFixed(0)+' ';}
+    });
+    let gridSvg='',xLabels='';
+    for(let g=0;g<=4;g++){
+      const y=pT+(g/4)*plH,val=(wMax-(g/4)*(wMax-wMin)).toFixed(0);
+      gridSvg+=`<line x1="${pL}" y1="${y}" x2="${cW-pR}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>`;
+      gridSvg+=`<text x="${pL-4}" y="${y+4}" text-anchor="end" font-size="9" fill="var(--text-muted)" font-family="'JetBrains Mono',monospace">${val}</text>`;
+    }
+    filled.forEach((w,i)=>{
+      if(i%(Math.ceil(pts/8))===0||i===pts-1){
+        const x=pL+(i/(pts-1))*plW;
+        xLabels+=`<text x="${x}" y="${cH-2}" text-anchor="middle" font-size="9" fill="var(--text-muted)">${w.label.replace('Hafta ','H').replace('Başlangıç','Baş')}</text>`;
+      }
+    });
+    const lastX=pL+((pts-1)/(pts-1))*plW;
+    const lastWY=pT+plH-(((filled[pts-1].weight-wMin)/(wMax-wMin))*plH);
+    html+=`<div class="dash-chart"><h3>Tartı & bel çevresi trendi</h3>
+      <svg viewBox="0 0 ${cW} ${cH}" style="width:100%;height:auto">
+        ${gridSvg}
+        <path d="${wLine}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${waistLine}" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,3"/>
+        <circle cx="${lastX}" cy="${lastWY.toFixed(0)}" r="4" fill="var(--accent)"/>
+        ${xLabels}
+      </svg>
+      <div style="display:flex;gap:14px;font-size:11px;color:var(--text-secondary);margin-top:6px">
+        <span><span style="display:inline-block;width:12px;height:2.5px;background:var(--accent);border-radius:1px;vertical-align:middle;margin-right:4px"></span>Tartı (kg)</span>
+        <span><span style="display:inline-block;width:12px;height:2px;border-top:2px dashed var(--success);vertical-align:middle;margin-right:4px"></span>Bel (cm)</span>
+      </div></div>`;
+  } else {
+    html+=`<div class="dash-chart"><h3>Tartı & bel çevresi trendi</h3><p style="color:var(--text-muted);font-size:13px;padding:20px 0;text-align:center">En az 2 haftalık veri girildikten sonra grafik görünecek.</p></div>`;
+  }
+
+  // === STRENGTH PROGRESSION BARS ===
+  const hasStrength=Object.keys(strengthData).length>0;
+  html+=`<div class="dash-chart"><h3>Güç Progresyonu ${hasStrength?'(Antrenman Günlüğü\'nden)':''}${!hasStrength?' — henüz veri yok':''}</h3>`;
+  if(hasStrength){
+    html+=`<div class="dash-bars">`;
+    INDICATOR_EXERCISES.forEach(ind=>{
+      const d=strengthData[ind.key];
+      if(!d)return;
+      const pct=d.first>0?Math.round(((d.last-d.first)/d.first)*100):0;
+      const barW=Math.min(95,Math.max(10,(d.last/(d.first*2))*100));
+      html+=`<div class="dash-bar-row">
+        <span class="db-name">${ind.name}</span>
+        <div class="db-track"><div class="db-fill" style="width:${barW}%;background:${ind.color}">${d.first} → ${d.last}</div></div>
+        <span class="db-pct">${pct>0?'+':''}${pct}%</span>
+      </div>`;
+    });
+    html+=`</div>`;
+  } else {
+    html+=`<p style="color:var(--text-muted);font-size:13px;padding:16px 0;text-align:center">Antrenman Günlüğü'ne set/tekrar girdiğinde burada gösterge hareketlerinin ilerlemesini göreceksin.</p>`;
+  }
+  html+=`</div>`;
+
+  document.getElementById('dash-content').innerHTML=html;
+}
+
+// Set sheets edit link
+document.getElementById('sheets-edit-link').href=SHEETS_EDIT;
+
+// Auto-load dashboard on page load (overview is default active page)
+loadAllData();
+</script>
+</body>
+</html>
