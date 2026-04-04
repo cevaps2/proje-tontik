@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dönüşüm Planı — Danışan Formu</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg-primary:#06080d;--bg-secondary:#0d1117;--bg-card:#151b25;--border:#1e2a3a;--border-light:#2a3a4e;--text-primary:#e8edf5;--text-secondary:#8b95a5;--text-muted:#5a6577;--accent:#3b82f6;--accent-warm:#f59e0b;--success:#22c55e;--danger:#ef4444;--radius:12px;--radius-sm:8px;--radius-lg:16px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+body{font-family:'Outfit',system-ui,sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-x:hidden;line-height:1.6}
+body::before{content:'';position:fixed;top:0;left:0;right:0;height:400px;background:radial-gradient(ellipse at 50% 0%,rgba(59,130,246,0.07) 0%,transparent 70%);pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg-primary)}::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px}
+
+.header{position:sticky;top:0;z-index:100;background:rgba(6,8,13,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px}
+.header-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-weight:800;font-size:20px;letter-spacing:-0.5px;background:linear-gradient(135deg,var(--text-primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.logo span{font-weight:400;opacity:0.6}
+.progress-bar{display:flex;gap:4px;align-items:center}
+.progress-dot{width:10px;height:10px;border-radius:50%;background:var(--border);transition:all 0.3s}
+.progress-dot.done{background:var(--accent);box-shadow:0 0 8px rgba(59,130,246,0.4)}
+.progress-dot.active{background:var(--accent-warm);box-shadow:0 0 8px rgba(245,158,11,0.4);transform:scale(1.2)}
+.progress-label{font-size:11px;color:var(--text-muted);margin-left:8px;font-family:'JetBrains Mono',monospace}
+
+.main{max-width:900px;margin:0 auto;padding:32px 24px 80px;position:relative;z-index:1}
+.hero{text-align:center;margin-bottom:48px}
+.hero h1{font-size:32px;font-weight:900;letter-spacing:-1px;margin-bottom:8px;background:linear-gradient(135deg,var(--text-primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:15px;color:var(--text-secondary);max-width:600px;margin:0 auto;line-height:1.7}
+
+/* SECTIONS */
+.form-section{margin-bottom:32px;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:border-color 0.3s}
+.form-section:hover{border-color:var(--border-light)}
+.section-header{padding:24px 28px 20px;display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.01)}
+.section-num{width:40px;height:40px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;flex-shrink:0}
+.section-num.blue{background:rgba(59,130,246,0.1);color:var(--accent);border:1px solid rgba(59,130,246,0.2)}
+.section-num.amber{background:rgba(245,158,11,0.1);color:var(--accent-warm);border:1px solid rgba(245,158,11,0.2)}
+.section-num.green{background:rgba(34,197,94,0.1);color:var(--success);border:1px solid rgba(34,197,94,0.2)}
+.section-num.red{background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.2)}
+.section-num.purple{background:rgba(168,85,247,0.1);color:#a855f7;border:1px solid rgba(168,85,247,0.2)}
+.section-num.pink{background:rgba(236,72,153,0.1);color:#ec4899;border:1px solid rgba(236,72,153,0.2)}
+.section-num.cyan{background:rgba(6,182,212,0.1);color:#06b6d4;border:1px solid rgba(6,182,212,0.2)}
+.section-num.gray{background:rgba(139,149,165,0.1);color:var(--text-secondary);border:1px solid rgba(139,149,165,0.2)}
+.section-info h2{font-size:18px;font-weight:700;letter-spacing:-0.3px;margin-bottom:2px}
+.section-info p{font-size:13px;color:var(--text-secondary)}
+.section-body{padding:24px 28px}
+
+/* FORM ELEMENTS */
+.q-group{margin-bottom:24px}
+.q-group:last-child{margin-bottom:0}
+.q-label{font-size:14px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.q-label .req{color:var(--danger);font-size:16px}
+.q-label .opt{font-size:11px;color:var(--text-muted);font-weight:400;padding:2px 6px;border-radius:4px;background:rgba(139,149,165,0.1)}
+.q-hint{font-size:12px;color:var(--text-muted);margin-bottom:8px;line-height:1.5}
+
+input[type="text"],input[type="number"],textarea,select{
+  width:100%;padding:12px 16px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);background:var(--bg-secondary);
+  color:var(--text-primary);font-family:inherit;font-size:14px;
+  transition:border-color 0.2s,box-shadow 0.2s;outline:none;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,0.1)}
+textarea{resize:vertical;min-height:80px}
+input::placeholder,textarea::placeholder{color:var(--text-muted)}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b95a5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+select option{background:var(--bg-secondary);color:var(--text-primary)}
+
+.inline-group{display:flex;gap:12px}
+.inline-group>*{flex:1}
+@media(max-width:600px){.inline-group{flex-direction:column}}
+
+/* RADIO / CHECKBOX CUSTOM */
+.option-grid{display:flex;flex-wrap:wrap;gap:8px}
+.option-btn{
+  padding:8px 16px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);background:var(--bg-secondary);
+  color:var(--text-secondary);font-size:13px;font-weight:500;
+  cursor:pointer;transition:all 0.2s;user-select:none;
+}
+.option-btn:hover{border-color:var(--border-light);color:var(--text-primary)}
+.option-btn.selected{border-color:var(--accent);background:rgba(59,130,246,0.1);color:var(--accent);box-shadow:0 0 8px rgba(59,130,246,0.1)}
+.option-btn input{display:none}
+
+/* EQUIPMENT TAGS */
+.equip-grid{display:flex;flex-wrap:wrap;gap:8px}
+.equip-tag{
+  padding:10px 16px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);background:var(--bg-secondary);
+  color:var(--text-secondary);font-size:13px;font-weight:500;
+  cursor:pointer;transition:all 0.2s;user-select:none;
+  display:flex;align-items:center;gap:6px;
+}
+.equip-tag:hover{border-color:var(--border-light);color:var(--text-primary)}
+.equip-tag.selected{border-color:var(--success);background:rgba(34,197,94,0.08);color:var(--success)}
+.equip-tag .check{width:16px;height:16px;border-radius:4px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;transition:all 0.2s}
+.equip-tag.selected .check{border-color:var(--success);background:var(--success);color:#000}
+
+/* COPY BUTTON */
+.copy-section{text-align:center;padding:40px 20px;margin-top:20px}
+.copy-btn{
+  padding:16px 40px;border-radius:var(--radius);border:2px solid var(--accent);
+  background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(59,130,246,0.05));
+  color:var(--accent);font-family:inherit;font-size:16px;font-weight:700;
+  cursor:pointer;transition:all 0.3s;letter-spacing:0.3px;
+}
+.copy-btn:hover{background:var(--accent);color:#fff;box-shadow:0 4px 24px rgba(59,130,246,0.3);transform:translateY(-1px)}
+.copy-btn:active{transform:translateY(0)}
+.copy-btn.copied{background:var(--success);border-color:var(--success);color:#fff}
+.copy-hint{font-size:13px;color:var(--text-muted);margin-top:12px;line-height:1.6}
+
+.footer-note{text-align:center;padding:32px 0;font-size:12px;color:var(--text-muted)}
+
+/* SLIDER */
+.slider-wrap{display:flex;align-items:center;gap:16px}
+.slider-wrap input[type="range"]{
+  flex:1;-webkit-appearance:none;height:6px;border-radius:3px;
+  background:var(--border);outline:none;border:none;padding:0;
+}
+.slider-wrap input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+  background:var(--accent);cursor:pointer;box-shadow:0 2px 8px rgba(59,130,246,0.3);
+}
+.slider-val{
+  font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;
+  color:var(--accent);min-width:36px;text-align:center;
+}
+</style>
+</head>
+<body>
+
+<header class="header"><div class="header-inner">
+  <div class="logo">DÖNÜŞÜM <span>FORMU</span></div>
+  <div class="progress-bar">
+    <div class="progress-dot active" id="pd-0"></div>
+    <div class="progress-dot" id="pd-1"></div>
+    <div class="progress-dot" id="pd-2"></div>
+    <div class="progress-dot" id="pd-3"></div>
+    <div class="progress-dot" id="pd-4"></div>
+    <div class="progress-dot" id="pd-5"></div>
+    <div class="progress-dot" id="pd-6"></div>
+    <div class="progress-dot" id="pd-7"></div>
+    <span class="progress-label" id="progress-label">0/8</span>
+  </div>
+</div></header>
+
+<main class="main">
+
+<div class="hero">
+  <h1>Kişiselleştirilmiş Dönüşüm Planı</h1>
+  <p>Bu formu doldurarak sana özel antrenman, beslenme, postür ve uyku planı hazırlanacak. Ne kadar detaylı doldurursan plan o kadar isabetli olur. Bilmediğin yerlere "bilmiyorum" yazabilirsin.</p>
+</div>
+
+<!-- ===== 1. TEMEL BİLGİLER ===== -->
+<div class="form-section" id="sec-0">
+  <div class="section-header">
+    <div class="section-num blue">01</div>
+    <div class="section-info"><h2>Temel Bilgiler</h2><p>Planın temeli bu bilgilere dayanacak</p></div>
+  </div>
+  <div class="section-body">
+    <div class="q-group">
+      <div class="q-label">Adın <span class="req">*</span></div>
+      <input type="text" id="f-name" placeholder="Örn: Alper" oninput="trackProgress()">
+    </div>
+    <div class="inline-group">
+      <div class="q-group">
+        <div class="q-label">Doğum Tarihi <span class="req">*</span></div>
+        <input type="text" id="f-dob" placeholder="Örn: 3 Haziran 1988" oninput="trackProgress()">
+      </div>
+      <div class="q-group">
+        <div class="q-label">Cinsiyet <span class="req">*</span></div>
+        <select id="f-gender" onchange="trackProgress()">
+          <option value="">Seç...</option>
+          <option value="erkek">Erkek</option>
+          <option value="kadın">Kadın</option>
+        </select>
+      </div>
+    </div>
+    <div class="inline-group">
+      <div class="q-group">
+        <div class="q-label">Boy (cm) <span class="req">*</span></div>
+        <input type="number" id="f-height" placeholder="178" oninput="trackProgress()">
+      </div>
+      <div class="q-group">
+        <div class="q-label">Mevcut Kilo (kg) <span class="req">*</span></div>
+        <input type="number" id="f-weight" placeholder="100" oninput="trackProgress()">
+      </div>
+      <div class="q-group">
+        <div class="q-label">Hedef Kilo (kg) <span class="req">*</span></div>
+        <input type="number" id="f-target" placeholder="80" oninput="trackProgress()">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 2. HEDEF & MOTİVASYON ===== -->
+<div class="form-section" id="sec-1">
+  <div class="section-header">
+    <div class="section-num amber">02</div>
+    <div class="section-info"><h2>Hedef & Motivasyon</h2><p>Ne istediğini ve neden istediğini bilmek planın ruhunu belirler</p></div>
+  </div>
+  <div class="section-body">
+    <div class="q-group">
+      <div class="q-label">Bu dönüşümde en önemli hedeflerin neler?</div>
+      <div class="q-hint">Birden fazla seçebilirsin</div>
+      <div class="option-grid" id="og-goals">
+        <div class="option-btn" onclick="toggleOpt(this)">Kilo kaybı</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Fit / atletik görünüm</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Sağlığı iyileştirme</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Kas kazanımı</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Enerji artışı</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Postür düzeltme</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Özgüven</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Genel toparlanma</div>
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Daha önce kilo vermeyi veya düzenli spor yapmayı denedin mi?</div>
+      <div class="q-hint">Denediysen ne oldu? Bıraktıysan neden bıraktın?</div>
+      <textarea id="f-past-attempts" placeholder="Örn: 2 yıl önce koşmaya başladım ama dizim ağrıdı bıraktım..." oninput="trackProgress()"></textarea>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Motivasyonunu en çok ne kırar?</div>
+      <div class="option-grid" id="og-motivation-killers">
+        <div class="option-btn" onclick="toggleOpt(this)">Sonuç görememe</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Monotonluk</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Zaman bulamama</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Yorgunluk</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Diyet kısıtlamaları</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Sakatlanma korkusu</div>
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Günlük stres seviyen</div>
+      <div class="slider-wrap">
+        <span style="font-size:12px;color:var(--text-muted)">Düşük</span>
+        <input type="range" min="1" max="10" value="5" id="f-stress" oninput="document.getElementById('stress-val').textContent=this.value;trackProgress()">
+        <span style="font-size:12px;color:var(--text-muted)">Yüksek</span>
+        <span class="slider-val" id="stress-val">5</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 3. SAĞLIK ===== -->
+<div class="form-section" id="sec-2">
+  <div class="section-header">
+    <div class="section-num red">03</div>
+    <div class="section-info"><h2>Sağlık & Sakatlık</h2><p>Güvenli bir plan için kritik — doğru cevapla</p></div>
+  </div>
+  <div class="section-body">
+    <div class="q-group">
+      <div class="q-label">Mevcut veya geçmiş sakatlıklar / kronik ağrılar <span class="req">*</span></div>
+      <div class="q-hint">Bel, diz, omuz, boyun vb. — yoksa "yok" yaz</div>
+      <textarea id="f-injuries" placeholder="Örn: Sağ dizimde 2 yıl önce menisküs ameliyatı oldum..." oninput="trackProgress()"></textarea>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Kronik hastalık <span class="opt">varsa</span></div>
+      <div class="q-hint">Diyabet, tansiyon, tiroid, astım, kalp, vb.</div>
+      <input type="text" id="f-chronic" placeholder="Yoksa boş bırakabilirsin" oninput="trackProgress()">
+    </div>
+    <div class="q-group">
+      <div class="q-label">Düzenli kullandığın ilaç veya takviye <span class="opt">varsa</span></div>
+      <input type="text" id="f-meds" placeholder="Örn: Tiroid ilacı, D vitamini..." oninput="trackProgress()">
+    </div>
+    <div class="q-group">
+      <div class="q-label">Son 1 yılda kan tahlili yaptırdın mı?</div>
+      <div class="q-hint">Anormal çıkan değer varsa belirt</div>
+      <input type="text" id="f-blood" placeholder="Örn: Evet, karaciğer enzimleri hafif yüksek çıktı" oninput="trackProgress()">
+    </div>
+    <div class="q-group">
+      <div class="q-label">Bilinen alerji (yiyecek, ilaç, çevresel) <span class="opt">varsa</span></div>
+      <input type="text" id="f-allergy" placeholder="Örn: Laktoz intoleransı" oninput="trackProgress()">
+    </div>
+  </div>
+</div>
+
+<!-- ===== 4. FİTNESS SEVİYESİ ===== -->
+<div class="form-section" id="sec-3">
+  <div class="section-header">
+    <div class="section-num green">04</div>
+    <div class="section-info"><h2>Mevcut Fitness Seviyesi</h2><p>Doğru zorlukta başlamak için</p></div>
+  </div>
+  <div class="section-body">
+    <div class="q-group">
+      <div class="q-label">Aktivite seviyeni nasıl tanımlarsın? <span class="req">*</span></div>
+      <div class="option-grid" id="og-activity">
+        <div class="option-btn" onclick="selectOne(this,'og-activity')">Tamamen sedanter</div>
+        <div class="option-btn" onclick="selectOne(this,'og-activity')">Hafif aktif (ara sıra yürüyüş)</div>
+        <div class="option-btn" onclick="selectOne(this,'og-activity')">Orta aktif (haftada 1-2 aktivite)</div>
+        <div class="option-btn" onclick="selectOne(this,'og-activity')">Aktif (düzenli spor)</div>
+      </div>
+    </div>
+    <div class="inline-group">
+      <div class="q-group">
+        <div class="q-label">Tahmini şınav sayın (arka arkaya)</div>
+        <input type="text" id="f-pushup" placeholder="Örn: 5-6 tane, belki 0" oninput="trackProgress()">
+      </div>
+      <div class="q-group">
+        <div class="q-label">Barfiks çekebiliyor musun?</div>
+        <select id="f-pullup" onchange="trackProgress()">
+          <option value="">Seç...</option>
+          <option value="evet">Evet</option>
+          <option value="hayır">Hayır</option>
+          <option value="bilmiyorum">Hiç denemedim</option>
+        </select>
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Koşu bandı / yürüyüş kapasiten</div>
+      <input type="text" id="f-cardio" placeholder="Örn: 20 dk yürüyebilirim ama koşamam" oninput="trackProgress()">
+    </div>
+    <div class="q-group">
+      <div class="q-label">Merdiven çıkarken nefes nefese kalıyor musun?</div>
+      <div class="option-grid" id="og-stairs">
+        <div class="option-btn" onclick="selectOne(this,'og-stairs')">Evet, çok</div>
+        <div class="option-btn" onclick="selectOne(this,'og-stairs')">Biraz</div>
+        <div class="option-btn" onclick="selectOne(this,'og-stairs')">Hayır</div>
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Daha önce düzenli spor deneyimin</div>
+      <textarea id="f-sport-history" placeholder="Örn: Üniversitede 1 yıl yüzdüm, sonra bıraktım..." oninput="trackProgress()"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 5. EKİPMAN & ORTAM ===== -->
+<div class="form-section" id="sec-4">
+  <div class="section-header">
+    <div class="section-num purple">05</div>
+    <div class="section-info"><h2>Ekipman & Antrenman Ortamı</h2><p>Neyin var, nereye erişimin var?</p></div>
+  </div>
+  <div class="section-body">
+    <div class="q-group">
+      <div class="q-label">Nerede antrenman yapacaksın? <span class="req">*</span></div>
+      <div class="option-grid" id="og-location">
+        <div class="option-btn" onclick="selectOne(this,'og-location')">Evde</div>
+        <div class="option-btn" onclick="selectOne(this,'og-location')">Spor salonunda</div>
+        <div class="option-btn" onclick="selectOne(this,'og-location')">Hem ev hem salon</div>
+        <div class="option-btn" onclick="selectOne(this,'og-location')">Açık hava / park</div>
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Mevcut ekipmanın <span class="req">*</span></div>
+      <div class="q-hint">Sahip olduklarını seç — yoksa hiçbirini seçme</div>
+      <div class="equip-grid" id="equip-grid">
+        <div class="equip-tag" onclick="toggleEquip(this)"><span class="check">✓</span>Dumbbell (hafif, 1-3kg)</div>
+        <div class="equip-tag" onclick="toggleEquip(this)"><span class="check">✓</span>Dumbbell (orta, 4-8kg)</div>
+        <div class="equip-tag" onclick="toggleEquip(this)"><span class="check">✓</span>Dumbbell (ağır, 9kg+)</div>
+        <div class="equip-tag" onclick="toggleEquip(this)"><span class="check">✓</span>Barfiks çubuğu</div>
+        <div class="equip-tag" onclick="toggleEquip(this)"><span class="check">✓</span>Koşu bandı</div>
+        <div class="equip-tag" onclick="toggleEquip(this)"><span class="check">✓</span>Direnç bandı</div>
+        <div class="equip-tag" onclick="toggleEquip(this)"><span class="check">✓</span>Yoga matı</div>
+        <div class="equip-tag" onclick="toggleEquip(this)"><span class="check">✓</span>Foam roller</div>
+        <div class="equip-tag" onclick="toggleEquip(this)"><span class="check">✓</span>Kettlebell</div>
+        <div class="equip-tag" onclick="toggleEquip(this)"><span class="check">✓</span>Bench (sehpa)</div>
+        <div class="equip-tag" onclick="toggleEquip(this)"><span class="check">✓</span>Bisiklet (sabit/dış)</div>
+        <div class="equip-tag" onclick="toggleEquip(this)"><span class="check">✓</span>İp atlama</div>
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Listede olmayan fakat sahip olduğun diğer ekipmanlar <span class="opt">varsa</span></div>
+      <input type="text" id="f-other-equip" placeholder="Örn: TRX, ab wheel, battle rope..." oninput="trackProgress()">
+    </div>
+    <div class="q-group">
+      <div class="q-label">Almayı düşündüğün ekipman <span class="opt">varsa</span></div>
+      <input type="text" id="f-planned-equip" placeholder="Örn: Barfiks çubuğu almayı düşünüyorum" oninput="trackProgress()">
+    </div>
+    <div class="q-group">
+      <div class="q-label">Sevdiğin / yapmak istediğin hareket türleri <span class="opt">varsa</span></div>
+      <div class="q-hint">Ör: yer hareketleri severim, ağırlık kaldırmak istemem, yüzme tercihim...</div>
+      <input type="text" id="f-preferred-exercises" placeholder="Örn: Şınav, squat, koşu seviyorum ama burpee nefret" oninput="trackProgress()">
+    </div>
+  </div>
+</div>
+
+<!-- ===== 6. GÜNLÜK YAŞAM ===== -->
+<div class="form-section" id="sec-5">
+  <div class="section-header">
+    <div class="section-num cyan">06</div>
+    <div class="section-info"><h2>Günlük Yaşam & İş Düzeni</h2><p>Plan hayatına uymalı, hayatın plana değil</p></div>
+  </div>
+  <div class="section-body">
+    <div class="q-group">
+      <div class="q-label">Mesleğin / işin nedir?</div>
+      <input type="text" id="f-job" placeholder="Örn: Avukat, masa başı çalışıyorum" oninput="trackProgress()">
+    </div>
+    <div class="inline-group">
+      <div class="q-group">
+        <div class="q-label">Günlük masa başı süresi</div>
+        <select id="f-desk-hours" onchange="trackProgress()">
+          <option value="">Seç...</option>
+          <option value="0-2">0–2 saat</option>
+          <option value="3-5">3–5 saat</option>
+          <option value="6-8">6–8 saat</option>
+          <option value="8+">8+ saat</option>
+        </select>
+      </div>
+      <div class="q-group">
+        <div class="q-label">Çalışma saatleri</div>
+        <input type="text" id="f-work-hours" placeholder="Örn: Esnek, genelde 10:00-19:00" oninput="trackProgress()">
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Antrenman için tercih ettiğin saat dilimi</div>
+      <div class="option-grid" id="og-training-time">
+        <div class="option-btn" onclick="selectOne(this,'og-training-time')">Sabah (07-10)</div>
+        <div class="option-btn" onclick="selectOne(this,'og-training-time')">Öğlen (11-14)</div>
+        <div class="option-btn" onclick="selectOne(this,'og-training-time')">Öğleden sonra (15-18)</div>
+        <div class="option-btn" onclick="selectOne(this,'og-training-time')">Akşam (19-22)</div>
+        <div class="option-btn" onclick="selectOne(this,'og-training-time')">Farketmez</div>
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Hafta sonları düzenin nasıl?</div>
+      <input type="text" id="f-weekend" placeholder="Örn: Hafta içiyle aynı / geç kalkıyorum / daha aktifim" oninput="trackProgress()">
+    </div>
+    <div class="q-group">
+      <div class="q-label">Günlük tahmini adım sayısı</div>
+      <input type="text" id="f-steps" placeholder="Örn: 2000-3000, neredeyse hiç yürümüyorum" oninput="trackProgress()">
+    </div>
+  </div>
+</div>
+
+<!-- ===== 7. BESLENME & UYKU ===== -->
+<div class="form-section" id="sec-6">
+  <div class="section-header">
+    <div class="section-num pink">07</div>
+    <div class="section-info"><h2>Beslenme & Uyku & Alışkanlıklar</h2><p>Mevcut düzenin, planın başlangıç noktası</p></div>
+  </div>
+  <div class="section-body">
+    <div class="q-group">
+      <div class="q-label">Tipik bir günde ne yiyorsun? <span class="req">*</span></div>
+      <div class="q-hint">Kabaca — "öğlen dışarıdan döner, akşam evde makarna" gibi</div>
+      <textarea id="f-current-diet" placeholder="Örn: Kahvaltı yapmam, öğlen kantinde yemek, akşam evde makarna/pilav..." oninput="trackProgress()"></textarea>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Yemek pişirme durumun</div>
+      <div class="option-grid" id="og-cooking">
+        <div class="option-btn" onclick="selectOne(this,'og-cooking')">Severim ve yapabilirim</div>
+        <div class="option-btn" onclick="selectOne(this,'og-cooking')">Basit şeyler yapabilirim</div>
+        <div class="option-btn" onclick="selectOne(this,'og-cooking')">Pişiremem / istemem</div>
+        <div class="option-btn" onclick="selectOne(this,'og-cooking')">Benim yerime pişiren var</div>
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Besin intoleransı / alerji <span class="opt">varsa</span></div>
+      <input type="text" id="f-food-allergy" placeholder="Örn: Laktoz intoleransı, gluten hassasiyeti" oninput="trackProgress()">
+    </div>
+    <div class="inline-group">
+      <div class="q-group">
+        <div class="q-label">Günlük su tüketimi</div>
+        <select id="f-water" onchange="trackProgress()">
+          <option value="">Seç...</option>
+          <option value="az">Az (1-3 bardak)</option>
+          <option value="orta">Orta (4-7 bardak)</option>
+          <option value="iyi">İyi (8+ bardak)</option>
+          <option value="bilmiyorum">Bilmiyorum</option>
+        </select>
+      </div>
+      <div class="q-group">
+        <div class="q-label">Kahve / çay tüketimi</div>
+        <input type="text" id="f-caffeine" placeholder="Örn: Günde 3 kahve, şekersiz" oninput="trackProgress()">
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Fast food / abur cubur sıklığı</div>
+      <div class="option-grid" id="og-junk">
+        <div class="option-btn" onclick="selectOne(this,'og-junk')">Nadiren</div>
+        <div class="option-btn" onclick="selectOne(this,'og-junk')">Haftada 1-2</div>
+        <div class="option-btn" onclick="selectOne(this,'og-junk')">Haftada 3+</div>
+        <div class="option-btn" onclick="selectOne(this,'og-junk')">Neredeyse her gün</div>
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Alkol tüketimi</div>
+      <div class="q-hint">Bira, şarap, rakı, kokteyl vb. — günlük veya haftalık miktarı belirt</div>
+      <textarea id="f-alcohol" placeholder="Örn: Her akşam 2 bira (50cl) / Haftada 1-2 kadeh şarap / İçmiyorum" oninput="trackProgress()"></textarea>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Sigara / tütün kullanımı <span class="opt">varsa</span></div>
+      <input type="text" id="f-smoking" placeholder="Örn: Günde 1 paket / Bıraktım / İçmiyorum" oninput="trackProgress()">
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:28px 0"></div>
+
+    <div class="q-group">
+      <div class="q-label">Mevcut uyku düzenin <span class="req">*</span></div>
+      <div class="inline-group">
+        <div>
+          <div class="q-hint">Yatış saati</div>
+          <input type="text" id="f-sleep-current" placeholder="Örn: 03:00" oninput="trackProgress()">
+        </div>
+        <div>
+          <div class="q-hint">Kalkış saati</div>
+          <input type="text" id="f-wake-current" placeholder="Örn: 11:00" oninput="trackProgress()">
+        </div>
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Hedef uyku düzenin <span class="req">*</span></div>
+      <div class="inline-group">
+        <div>
+          <div class="q-hint">Hedef yatış</div>
+          <input type="text" id="f-sleep-target" placeholder="Örn: 00:00" oninput="trackProgress()">
+        </div>
+        <div>
+          <div class="q-hint">Hedef kalkış</div>
+          <input type="text" id="f-wake-target" placeholder="Örn: 08:00" oninput="trackProgress()">
+        </div>
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Kahvaltı tercihin</div>
+      <div class="option-grid" id="og-breakfast">
+        <div class="option-btn" onclick="selectOne(this,'og-breakfast')">Kahvaltı yapmam</div>
+        <div class="option-btn" onclick="selectOne(this,'og-breakfast')">Hafif bir şeyler</div>
+        <div class="option-btn" onclick="selectOne(this,'og-breakfast')">Normal kahvaltı</div>
+        <div class="option-btn" onclick="selectOne(this,'og-breakfast')">Farketmez</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 8. VÜCUT ÖLÇÜLERİ ===== -->
+<div class="form-section" id="sec-7">
+  <div class="section-header">
+    <div class="section-num gray">08</div>
+    <div class="section-info"><h2>Vücut Ölçüleri & Son Sözler</h2><p>Detay, planı keskinleştirir</p></div>
+  </div>
+  <div class="section-body">
+    <div class="q-group">
+      <div class="q-label">Bel çevresi (göbek hizası, cm) <span class="opt">biliyorsan</span></div>
+      <input type="text" id="f-waist" placeholder="Örn: 105 cm" oninput="trackProgress()">
+    </div>
+    <div class="q-group">
+      <div class="q-label">Kilonun nerede toplandığını tarif et</div>
+      <div class="option-grid" id="og-fat-dist">
+        <div class="option-btn" onclick="toggleOpt(this)">Göbek baskın</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Genel dağılım</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Kalça & bacak</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Göğüs & karın</div>
+        <div class="option-btn" onclick="toggleOpt(this)">Yüz & boyun</div>
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Vücut tipini nasıl tanımlarsın?</div>
+      <div class="option-grid" id="og-bodytype">
+        <div class="option-btn" onclick="selectOne(this,'og-bodytype')">Geniş omuz, iri yapı</div>
+        <div class="option-btn" onclick="selectOne(this,'og-bodytype')">Orta yapı</div>
+        <div class="option-btn" onclick="selectOne(this,'og-bodytype')">İnce yapı ama göbekli</div>
+        <div class="option-btn" onclick="selectOne(this,'og-bodytype')">Genel olarak kilolu</div>
+      </div>
+    </div>
+    <div class="q-group">
+      <div class="q-label">Vücut yağ oranını biliyor musun?</div>
+      <input type="text" id="f-bodyfat" placeholder="Bilmiyorum / Tahminen %25-30 / Ölçtürdüm: %28" oninput="trackProgress()">
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:28px 0"></div>
+
+    <div class="q-group">
+      <div class="q-label" style="color:var(--accent-warm)">✨ Bunların dışında eklemek istediğin, bilmemin faydalı olacağını düşündüğün, dikkate almamı talep ettiğin başka bir konu var mı?</div>
+      <div class="q-hint">Burada formda bulunmayan her şeyi yazabilirsin — özel durumlar, tercihler, korkular, sorular, ne olursa olsun.</div>
+      <textarea id="f-freetext" rows="5" placeholder="Örn: Sağ omzumda ağrı var ama doktora gitmedim... / Vejetaryenim... / Ramazanda oruç tutacağım... / Evcil hayvanımla yürüyüş yapabilirim..." oninput="trackProgress()"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- COPY -->
+<div class="copy-section">
+  <button class="copy-btn" id="copy-btn" onclick="copyAll()">📋 Formu Kopyala</button>
+  <p class="copy-hint">Butona tıklayınca tüm cevapların panoya kopyalanır.<br>Sonra Claude'a yapıştırıp "Bu bilgilere göre dönüşüm planımı hazırla" de.</p>
+</div>
+
+</main>
+<div class="footer-note">Dönüşüm Planı Danışan Formu — Tüm bilgiler gizli tutulur ve yalnızca plan hazırlamak için kullanılır</div>
+
+<script>
+function toggleOpt(el){el.classList.toggle('selected');trackProgress()}
+function selectOne(el,groupId){
+  document.querySelectorAll('#'+groupId+' .option-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');trackProgress();
+}
+function toggleEquip(el){el.classList.toggle('selected');trackProgress()}
+
+function trackProgress(){
+  const required=[
+    document.getElementById('f-name').value,
+    document.getElementById('f-dob').value,
+    document.getElementById('f-gender').value,
+    document.getElementById('f-height').value,
+    document.getElementById('f-weight').value,
+    document.getElementById('f-target').value,
+    document.getElementById('f-injuries').value,
+    document.getElementById('f-current-diet').value,
+  ];
+  // Track sections with any content
+  const secs=[
+    !!(required[0]&&required[1]&&required[2]&&required[3]&&required[4]&&required[5]),
+    !!(document.querySelectorAll('#og-goals .selected').length||document.getElementById('f-past-attempts').value),
+    !!document.getElementById('f-injuries').value,
+    !!(document.getElementById('f-pushup').value||document.querySelectorAll('#og-activity .selected').length),
+    !!document.querySelectorAll('#equip-grid .selected').length,
+    !!(document.getElementById('f-job').value||document.getElementById('f-desk-hours').value),
+    !!(document.getElementById('f-current-diet').value||document.getElementById('f-sleep-current').value),
+    !!(document.getElementById('f-waist').value||document.querySelectorAll('#og-fat-dist .selected').length||document.getElementById('f-freetext').value),
+  ];
+  let done=0;
+  secs.forEach((s,i)=>{
+    const dot=document.getElementById('pd-'+i);
+    if(s){dot.className='progress-dot done';done++}
+    else{dot.className='progress-dot'}
+  });
+  document.getElementById('progress-label').textContent=done+'/8';
+}
+
+function getSelected(groupId){
+  return [...document.querySelectorAll('#'+groupId+' .selected')].map(e=>e.textContent.replace('✓','').trim()).join(', ');
+}
+
+function val(id){return(document.getElementById(id)?.value||'').trim()||'—'}
+
+function copyAll(){
+  let t = `═══════════════════════════════════════
+  DÖNÜŞÜM PLANI — DANIŞAN FORMU
+═══════════════════════════════════════
+
+▸ 01. TEMEL BİLGİLER
+Ad: ${val('f-name')}
+Doğum Tarihi: ${val('f-dob')}
+Cinsiyet: ${val('f-gender')}
+Boy: ${val('f-height')} cm
+Mevcut Kilo: ${val('f-weight')} kg
+Hedef Kilo: ${val('f-target')} kg
+
+▸ 02. HEDEF & MOTİVASYON
+Hedefler: ${getSelected('og-goals')||'—'}
+Geçmiş denemeler: ${val('f-past-attempts')}
+Motivasyon kırıcılar: ${getSelected('og-motivation-killers')||'—'}
+Stres seviyesi (1-10): ${val('f-stress')}
+
+▸ 03. SAĞLIK & SAKATLIK
+Sakatlık / Ağrı: ${val('f-injuries')}
+Kronik hastalık: ${val('f-chronic')}
+İlaç / Takviye: ${val('f-meds')}
+Kan tahlili: ${val('f-blood')}
+Alerji: ${val('f-allergy')}
+
+▸ 04. MEVCUT FİTNESS SEVİYESİ
+Aktivite seviyesi: ${getSelected('og-activity')||'—'}
+Şınav kapasitesi: ${val('f-pushup')}
+Barfiks: ${val('f-pullup')}
+Kardiyo kapasitesi: ${val('f-cardio')}
+Merdiven nefes durumu: ${getSelected('og-stairs')||'—'}
+Spor geçmişi: ${val('f-sport-history')}
+
+▸ 05. EKİPMAN & ORTAM
+Antrenman yeri: ${getSelected('og-location')||'—'}
+Mevcut ekipman: ${getSelected('equip-grid')||'—'}
+Listede olmayan diğer ekipman: ${val('f-other-equip')}
+Almayı düşündüğü: ${val('f-planned-equip')}
+Hareket tercihleri: ${val('f-preferred-exercises')}
+
+▸ 06. GÜNLÜK YAŞAM & İŞ DÜZENİ
+Meslek: ${val('f-job')}
+Masa başı süresi: ${val('f-desk-hours')}
+Çalışma saatleri: ${val('f-work-hours')}
+Antrenman saati tercihi: ${getSelected('og-training-time')||'—'}
+Hafta sonu düzeni: ${val('f-weekend')}
+Günlük adım sayısı: ${val('f-steps')}
+
+▸ 07. BESLENME & UYKU & ALIŞKANLIKLAR
+Mevcut beslenme: ${val('f-current-diet')}
+Yemek pişirme: ${getSelected('og-cooking')||'—'}
+Besin intoleransı: ${val('f-food-allergy')}
+Su tüketimi: ${val('f-water')}
+Kahve/çay: ${val('f-caffeine')}
+Fast food sıklığı: ${getSelected('og-junk')||'—'}
+Alkol: ${val('f-alcohol')}
+Sigara: ${val('f-smoking')}
+Mevcut uyku: ${val('f-sleep-current')} yatış — ${val('f-wake-current')} kalkış
+Hedef uyku: ${val('f-sleep-target')} yatış — ${val('f-wake-target')} kalkış
+Kahvaltı tercihi: ${getSelected('og-breakfast')||'—'}
+
+▸ 08. VÜCUT ÖLÇÜLERİ
+Bel çevresi: ${val('f-waist')}
+Yağ dağılımı: ${getSelected('og-fat-dist')||'—'}
+Vücut tipi: ${getSelected('og-bodytype')||'—'}
+Vücut yağ oranı: ${val('f-bodyfat')}
+
+▸ EK NOTLAR
+${val('f-freetext')}
+
+═══════════════════════════════════════
+Bu formu Claude'a yapıştırıp şunu de:
+"Bu bilgilere göre bana kişiselleştirilmiş
+ dönüşüm planı (proje_alper formatında) hazırla."
+═══════════════════════════════════════`;
+
+  navigator.clipboard.writeText(t).then(()=>{
+    const btn=document.getElementById('copy-btn');
+    btn.textContent='✅ Kopyalandı!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Formu Kopyala';btn.classList.remove('copied')},2500);
+  }).catch(()=>{
+    // Fallback
+    const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    const btn=document.getElementById('copy-btn');btn.textContent='✅ Kopyalandı!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Formu Kopyala';btn.classList.remove('copied')},2500);
+  });
+}
+</script>
+</body>
+</html>
